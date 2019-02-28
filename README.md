@@ -1,5 +1,6 @@
 # Azure LED Booth
-An LED art piece for conference booths that attendees can control from Azure
+
+An LED art piece for conference booths that attendees can control from Azure. This project is, in part, based on @nebrius [Raver Lights](https://github.com/nebrius/raver-lights) project.
 
 # License
 
