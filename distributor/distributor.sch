@@ -1,0 +1,150 @@
+EESchema Schematic File Version 4
+LIBS:distributor-cache
+EELAYER 29 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Connector:Conn_01x03_Male J1
+U 1 1 5CB12749
+P 3050 2500
+F 0 "J1" H 3158 2781 50  0000 C CNN
+F 1 "Conn_01x03_Male" H 3158 2690 50  0000 C CNN
+F 2 "Connector_JST:JST_VH_S3P-VH_1x03_P3.96mm_Horizontal" H 3050 2500 50  0001 C CNN
+F 3 "~" H 3050 2500 50  0001 C CNN
+	1    3050 2500
+	1    0    0    -1
+$EndComp
+$Comp
+L Connector:Conn_01x03_Male J3
+U 1 1 5CB12DA5
+P 3050 3000
+F 0 "J3" H 3158 3281 50  0000 C CNN
+F 1 "Conn_01x03_Male" H 3158 3190 50  0000 C CNN
+F 2 "Connector_JST:JST_VH_S3P-VH_1x03_P3.96mm_Horizontal" H 3050 3000 50  0001 C CNN
+F 3 "~" H 3050 3000 50  0001 C CNN
+	1    3050 3000
+	1    0    0    -1
+$EndComp
+$Comp
+L Connector:Conn_01x03_Male J5
+U 1 1 5CB13029
+P 3050 3500
+F 0 "J5" H 3158 3781 50  0000 C CNN
+F 1 "Conn_01x03_Male" H 3158 3690 50  0000 C CNN
+F 2 "Connector_JST:JST_VH_S3P-VH_1x03_P3.96mm_Horizontal" H 3050 3500 50  0001 C CNN
+F 3 "~" H 3050 3500 50  0001 C CNN
+	1    3050 3500
+	1    0    0    -1
+$EndComp
+$Comp
+L Connector:Conn_01x03_Male J4
+U 1 1 5CB1392C
+P 3950 3300
+F 0 "J4" H 3922 3232 50  0000 R CNN
+F 1 "Conn_01x03_Male" H 3922 3323 50  0000 R CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Horizontal" H 3950 3300 50  0001 C CNN
+F 3 "~" H 3950 3300 50  0001 C CNN
+	1    3950 3300
+	-1   0    0    1
+$EndComp
+$Comp
+L Connector:Conn_01x02_Male J2
+U 1 1 5CB13ECD
+P 3950 2400
+F 0 "J2" H 3922 2374 50  0000 R CNN
+F 1 "Conn_01x02_Male" H 3922 2283 50  0000 R CNN
+F 2 "Connector_JST:JST_VH_S2P-VH_1x02_P3.96mm_Horizontal" H 3950 2400 50  0001 C CNN
+F 3 "~" H 3950 2400 50  0001 C CNN
+	1    3950 2400
+	-1   0    0    -1
+$EndComp
+Wire Wire Line
+	3250 2400 3450 2400
+Wire Wire Line
+	3450 2400 3450 2900
+Wire Wire Line
+	3450 2900 3250 2900
+Wire Wire Line
+	3450 2900 3450 3200
+Wire Wire Line
+	3450 3400 3250 3400
+Connection ~ 3450 2900
+Wire Wire Line
+	3250 2500 3550 2500
+Wire Wire Line
+	3550 2500 3550 3000
+Wire Wire Line
+	3550 3000 3250 3000
+Wire Wire Line
+	3550 3000 3550 3300
+Wire Wire Line
+	3550 3500 3250 3500
+Connection ~ 3550 3000
+Wire Wire Line
+	3550 3300 3750 3300
+Connection ~ 3550 3300
+Wire Wire Line
+	3550 3300 3550 3500
+Wire Wire Line
+	3250 2600 3650 2600
+Wire Wire Line
+	3650 2600 3650 3100
+Wire Wire Line
+	3650 3600 3250 3600
+Wire Wire Line
+	3250 3100 3650 3100
+Connection ~ 3650 3100
+Wire Wire Line
+	3750 2400 3450 2400
+Connection ~ 3450 2400
+Wire Wire Line
+	3750 2500 3650 2500
+Wire Wire Line
+	3650 2500 3650 2600
+Connection ~ 3650 2600
+$Comp
+L Mechanical:MountingHole H1
+U 1 1 5CB28261
+P 5000 2400
+F 0 "H1" H 5100 2446 50  0000 L CNN
+F 1 "MountingHole" H 5100 2355 50  0000 L CNN
+F 2 "MountingHole:MountingHole_3.7mm" H 5000 2400 50  0001 C CNN
+F 3 "~" H 5000 2400 50  0001 C CNN
+	1    5000 2400
+	1    0    0    -1
+$EndComp
+$Comp
+L Mechanical:MountingHole H2
+U 1 1 5CB288C3
+P 5000 2700
+F 0 "H2" H 5100 2746 50  0000 L CNN
+F 1 "MountingHole" H 5100 2655 50  0000 L CNN
+F 2 "MountingHole:MountingHole_3.7mm" H 5000 2700 50  0001 C CNN
+F 3 "~" H 5000 2700 50  0001 C CNN
+	1    5000 2700
+	1    0    0    -1
+$EndComp
+Wire Wire Line
+	3650 3100 3650 3400
+Wire Wire Line
+	3750 3200 3450 3200
+Connection ~ 3450 3200
+Wire Wire Line
+	3450 3200 3450 3400
+Wire Wire Line
+	3750 3400 3650 3400
+Connection ~ 3650 3400
+Wire Wire Line
+	3650 3400 3650 3600
+$EndSCHEMATC
