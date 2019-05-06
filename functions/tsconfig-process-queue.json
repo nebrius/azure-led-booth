@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig-base.json",
+  "include": [
+    "process-queue/src/**/*.ts"
+  ],
+  "compilerOptions": {
+    "outDir": "process-queue/dist",
+    "rootDir": "process-queue/src",
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig-base.json",
+  "include": [
+    "submit-custom/src/**/*.ts"
+  ],
+  "compilerOptions": {
+    "outDir": "submit-custom/dist",
+    "rootDir": "submit-custom/src",
+  }
+}

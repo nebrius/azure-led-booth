@@ -1,0 +1,30 @@
+{
+  "name": "azure-led-booth-functions",
+  "version": "1.0.0",
+  "description": "Function for getting the submission queue",
+  "bin": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+
+    "prebuild:get-queue": "tslint -p tsconfig-get-queue.json",
+    "build:get-queue": "tsc --build tsconfig-get-queue.json",
+
+    "prebuild:process-queue": "tslint -p tsconfig-process-queue.json",
+    "build:process-queue": "tsc --build tsconfig-process-queue.json",
+
+    "prebuild:submit-basic": "tslint -p tsconfig-submit-basic.json",
+    "build:submit-basic": "tsc --build tsconfig-submit-basic.json",
+
+    "prebuild:submit-custom": "tslint -p tsconfig-submit-custom.json",
+    "build:submit-custom": "tsc --build tsconfig-submit-custom.json",
+
+    "build": "npm run build:get-queue && npm run build:process-queue && npm run build:submit-basic && npm run build:submit-custom"
+  },
+  "devDependencies": {
+    "@types/node": "^12.0.0",
+    "tslint": "^5.16.0",
+    "typescript": "^3.4.4"
+  },
+  "author": "Bryan Hughes <bryan@nebri.us>",
+  "license": "MIT"
+}

@@ -1,3 +1,4 @@
+"use strict";
 /*
 MIT License
 
@@ -21,8 +22,5 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-
-module.exports = (context: any) => {
-  // function logic goes here :)
-  context.done();
-};
+Object.defineProperty(exports, "__esModule", { value: true });
+//# sourceMappingURL=IBasicSubmission.js.map

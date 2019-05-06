@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig-base.json",
+  "include": [
+    "get-queue/src/**/*.ts"
+  ],
+  "compilerOptions": {
+    "outDir": "get-queue/dist",
+    "rootDir": "get-queue/src",
+  }
+}
