@@ -1,0 +1,28 @@
+{
+  "name": "basic",
+  "version": "1.0.0",
+  "description": "Web client for submitting basic animations",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prebuild": "tslint src/**/*",
+    "build": "webpack"
+  },
+  "devDependencies": {
+    "@types/color-convert": "^1.9.0",
+    "@types/react": "^16.8.14",
+    "@types/react-dom": "^16.8.4",
+    "ts-loader": "^5.3.3",
+    "tslint": "^5.16.0",
+    "typescript": "^3.4.4",
+    "webpack": "^4.30.0",
+    "webpack-cli": "^3.3.0"
+  },
+  "dependencies": {
+    "@material-ui/core": "^3.9.3",
+    "color-convert": "^2.0.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6"
+  },
+  "author": "Bryan Hughes <bryan@nebri.us>",
+  "license": "MIT"
+}
