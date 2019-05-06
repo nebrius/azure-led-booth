@@ -22,10 +22,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import { IWaveParameters } from './IWaves';
+export interface IWaveChannel {
+  a: number; // Default 0
+  b: number; // Default 0
+  w_t: number; // Default 0
+  w_x: number; // Default 0
+  phi: number; // Default 0
+}
 
-export interface ICustomSubmission {
-  authToken: string;
-  displayName: string;
-  animation: IWaveParameters;
+export interface IWave {
+  h: IWaveChannel;
+  s: IWaveChannel;
+  v: IWaveChannel;
+  a: IWaveChannel;
+}
+
+export interface IWaveParameters {
+  timePeriod?: number; // Default 255
+  distancePeriod?: number; // Default 32
+  waves: IWave[];
 }

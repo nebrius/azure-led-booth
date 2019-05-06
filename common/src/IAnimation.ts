@@ -24,8 +24,6 @@ SOFTWARE.
 
 import { IWaveParameters } from './IWaves';
 
-export interface ICustomSubmission {
-  authToken: string;
-  displayName: string;
+export interface IAnimation {
   animation: IWaveParameters;
 }
