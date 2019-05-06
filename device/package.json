@@ -1,0 +1,13 @@
+{
+  "name": "device",
+  "version": "1.0.0",
+  "description": "The device code for the Raspberry Pi controller",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prebuild": "tslint -p tsconfig.json",
+    "build": "tsc --build tsconfig.json"
+  },
+  "author": "Bryan Hughes <bryan@nebri.us>",
+  "license": "MIT"
+}
