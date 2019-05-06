@@ -1,5 +1,5 @@
 {
-  "extends": "./tsconfig-base.json",
+  "extends": "./tsconfig-functions-base.json",
   "include": [
     "submit-custom/src/**/*.ts"
   ],

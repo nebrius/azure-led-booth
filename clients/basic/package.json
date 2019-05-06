@@ -4,7 +4,7 @@
   "description": "Web client for submitting basic animations",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prebuild": "tslint src/**/*",
+    "prebuild": "tslint -p tsconfig.json",
     "build": "webpack"
   },
   "devDependencies": {
