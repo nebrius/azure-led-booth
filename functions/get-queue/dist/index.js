@@ -22,8 +22,22 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-module.exports = (context) => {
-    // function logic goes here :)
-    context.done();
+Object.defineProperty(exports, "__esModule", { value: true });
+const getQueueTrigger = async (context, req) => {
+    context.log('HTTP trigger function processed a request.');
+    const name = (req.query.name || (req.body && req.body.name));
+    if (name) {
+        context.res = {
+            // status: 200, /* Defaults to 200 */
+            body: `Hello ${(req.query.name || req.body.name)}`
+        };
+    }
+    else {
+        context.res = {
+            status: 400,
+            body: 'Please pass a name on the query string or in the request body'
+        };
+    }
 };
+exports.default = getQueueTrigger;
 //# sourceMappingURL=index.js.map

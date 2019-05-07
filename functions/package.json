@@ -16,13 +16,11 @@
     "build": "npm run build:get-queue && npm run build:process-queue && npm run build:submit-basic && npm run build:submit-custom"
   },
   "devDependencies": {
+    "@azure/functions": "^1.0.3",
     "@types/node": "^12.0.0",
     "tslint": "^5.16.0",
-    "typescript": "^3.4.4"
+    "typescript": "^3.4.5"
   },
   "author": "Bryan Hughes <bryan@nebri.us>",
-  "license": "MIT",
-  "dependencies": {
-    "@azure/functions": "^1.0.3"
-  }
+  "license": "MIT"
 }

@@ -23,12 +23,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 Object.defineProperty(exports, "__esModule", { value: true });
-const timerTrigger = async (context, myTimer) => {
+const processQueueTrigger = async (context, myTimer) => {
     const timeStamp = new Date().toISOString();
     if (myTimer.IsPastDue) {
         context.log('Timer function is running late!');
     }
     context.log('Timer trigger function ran!', timeStamp);
 };
-exports.default = timerTrigger;
+exports.default = processQueueTrigger;
 //# sourceMappingURL=index.js.map

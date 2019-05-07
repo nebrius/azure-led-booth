@@ -24,7 +24,7 @@ SOFTWARE.
 
 import { AzureFunction, Context } from '@azure/functions';
 
-const timerTrigger: AzureFunction = async (context: Context, myTimer: any): Promise<void> => {
+const processQueueTrigger: AzureFunction = async (context: Context, myTimer: any): Promise<void> => {
   const timeStamp = new Date().toISOString();
 
   if (myTimer.IsPastDue) {
@@ -33,4 +33,4 @@ const timerTrigger: AzureFunction = async (context: Context, myTimer: any): Prom
   context.log('Timer trigger function ran!', timeStamp);
 };
 
-export default timerTrigger;
+export default processQueueTrigger;
