@@ -12,17 +12,8 @@
     },
     {
       "type": "shell",
-      "label": "npm install",
-      "command": "npm install",
-      "options": {
-        "cwd": "${workspaceFolder}/functions"
-      }
-    },
-    {
-      "type": "shell",
-      "label": "npm prune",
-      "command": "npm prune --production",
-      "problemMatcher": [],
+      "label": "build",
+      "command": "npm run build",
       "options": {
         "cwd": "${workspaceFolder}/functions"
       }
