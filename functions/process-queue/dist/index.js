@@ -22,8 +22,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-module.exports = (context) => {
-    // function logic goes here :)
-    context.done();
+Object.defineProperty(exports, "__esModule", { value: true });
+const timerTrigger = async (context, myTimer) => {
+    const timeStamp = new Date().toISOString();
+    if (myTimer.IsPastDue) {
+        context.log('Timer function is running late!');
+    }
+    context.log('Timer trigger function ran!', timeStamp);
 };
+exports.default = timerTrigger;
 //# sourceMappingURL=index.js.map

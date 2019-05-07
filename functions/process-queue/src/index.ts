@@ -22,7 +22,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-module.exports = (context: any) => {
-  // function logic goes here :)
-  context.done();
+import { AzureFunction, Context } from '@azure/functions';
+
+const timerTrigger: AzureFunction = async (context: Context, myTimer: any): Promise<void> => {
+  const timeStamp = new Date().toISOString();
+
+  if (myTimer.IsPastDue) {
+    context.log('Timer function is running late!');
+  }
+  context.log('Timer trigger function ran!', timeStamp);
 };
+
+export default timerTrigger;
