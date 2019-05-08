@@ -1,3 +1,4 @@
+"use strict";
 /*
 MIT License
 
@@ -21,7 +22,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-
-export * from './src/util';
-export * from './src/IBasicSubmission';
-export * from './src/ICustomSubmission';
+Object.defineProperty(exports, "__esModule", { value: true });
+function getEnvironmentVariable(name) {
+    const value = process.env[name];
+    if (typeof value !== 'string') {
+        throw new Error(`Environment variable ${name} is not defined`);
+    }
+    return value;
+}
+exports.getEnvironmentVariable = getEnvironmentVariable;
+//# sourceMappingURL=util.js.map

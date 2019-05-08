@@ -22,6 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-export * from './src/util';
-export * from './src/IBasicSubmission';
-export * from './src/ICustomSubmission';
+export function getEnvironmentVariable(name: string): string {
+  const value = process.env[name];
+  if (typeof value !== 'string') {
+    throw new Error(`Environment variable ${name} is not defined`);
+  }
+  return value;
+}

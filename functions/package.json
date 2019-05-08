@@ -22,5 +22,8 @@
     "typescript": "^3.4.5"
   },
   "author": "Bryan Hughes <bryan@nebri.us>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "azure-storage": "^2.10.3"
+  }
 }
