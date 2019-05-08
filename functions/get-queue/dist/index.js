@@ -25,29 +25,36 @@ SOFTWARE.
 Object.defineProperty(exports, "__esModule", { value: true });
 const azure_storage_1 = require("azure-storage");
 const common_1 = require("./common/common");
-const util_1 = require("util");
 const AZURE_STORAGE_QUEUE_NAME = common_1.getEnvironmentVariable('AZURE_STORAGE_QUEUE_NAME');
-const AZURE_STORAGE_ACCOUNT = common_1.getEnvironmentVariable('AZURE_STORAGE_ACCOUNT');
-const AZURE_STORAGE_ACCESS_KEY = common_1.getEnvironmentVariable('AZURE_STORAGE_ACCESS_KEY');
 const AZURE_STORAGE_CONNECTION_STRING = common_1.getEnvironmentVariable('AZURE_STORAGE_CONNECTION_STRING');
 const getQueueTrigger = async (context, req) => {
     context.log('HTTP trigger function processed a request.');
-    const name = (req.query.name || (req.body && req.body.name));
-    const queueService = azure_storage_1.createQueueService(AZURE_STORAGE_ACCOUNT, AZURE_STORAGE_ACCESS_KEY, AZURE_STORAGE_CONNECTION_STRING);
-    const result = await util_1.promisify(queueService.createQueueIfNotExists)(AZURE_STORAGE_QUEUE_NAME);
-    console.log(result);
-    if (name) {
-        context.res = {
-            // status: 200, /* Defaults to 200 */
-            body: `Hello ${(req.query.name || req.body.name)}`
-        };
-    }
-    else {
-        context.res = {
-            status: 400,
-            body: 'Please pass a name on the query string or in the request body'
-        };
-    }
+    const userId = req.query.userId;
+    context.log(userId); // TODO: integrate
+    const queueService = azure_storage_1.createQueueService(AZURE_STORAGE_CONNECTION_STRING);
+    queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, (createErr, createResult, createResponse) => {
+        context.log(createErr, createResult, createResponse);
+        if (createErr) {
+            context.res = {
+                status: 500,
+                body: 'Could not get queue'
+            };
+            return;
+        }
+        queueService.peekMessages(AZURE_STORAGE_QUEUE_NAME, { numOfMessages: 10000 }, (peekErr, peekResult, peekResponse) => {
+            context.log(peekErr, peekResult, peekResponse);
+            if (peekErr) {
+                context.res = {
+                    status: 500,
+                    body: 'Could not get messages in queue'
+                };
+                return;
+            }
+            context.res = {
+                body: JSON.stringify(peekResult)
+            };
+        });
+    });
 };
 exports.default = getQueueTrigger;
 //# sourceMappingURL=index.js.map

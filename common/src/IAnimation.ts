@@ -26,4 +26,6 @@ import { IWaveParameters } from './IWaves';
 
 export interface IAnimation {
   animation: IWaveParameters;
+  displayName: string | undefined;
+  userId: string;
 }

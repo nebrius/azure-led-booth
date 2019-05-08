@@ -27,30 +27,28 @@ import { createQueueService } from 'azure-storage';
 import { getEnvironmentVariable } from './common/common';
 
 const AZURE_STORAGE_QUEUE_NAME = getEnvironmentVariable('AZURE_STORAGE_QUEUE_NAME');
-const AZURE_STORAGE_ACCOUNT = getEnvironmentVariable('AZURE_STORAGE_ACCOUNT');
-const AZURE_STORAGE_ACCESS_KEY = getEnvironmentVariable('AZURE_STORAGE_ACCESS_KEY');
 const AZURE_STORAGE_CONNECTION_STRING = getEnvironmentVariable('AZURE_STORAGE_CONNECTION_STRING');
 
 const getQueueTrigger: AzureFunction = async (context: Context, req: HttpRequest): Promise<void> => {
   context.log('HTTP trigger function processed a request.');
-  // const name = (req.query.name || (req.body && req.body.name));
+  const userId = req.query.userId;
+  context.log(userId); // TODO: integrate
 
-  const queueService = createQueueService(
-    AZURE_STORAGE_ACCOUNT,
-    AZURE_STORAGE_ACCESS_KEY,
-    AZURE_STORAGE_CONNECTION_STRING);
-  queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, (err, result, response) => {
-    context.log(err, result, response);
-    if (err) {
+  const queueService = createQueueService(AZURE_STORAGE_CONNECTION_STRING);
+  // These _must_ be async-await so that context is populated before we return
+  queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, (createErr, createResult, createResponse) => {
+    context.log(createErr, createResult, createResponse);
+    if (createErr) {
       context.res = {
         status: 500,
         body: 'Could not get queue'
       };
-      return
+      return;
     }
-    queueService.peekMessages(AZURE_STORAGE_QUEUE_NAME, { numOfMessages: 10000 }, (err, result, response) => {
-      context.log(err, result, response);
-      if (err) {
+    queueService.peekMessages(AZURE_STORAGE_QUEUE_NAME, { numOfMessages: 10000 },
+      (peekErr, peekResult, peekResponse) => {
+      context.log(peekErr, peekResult, peekResponse);
+      if (peekErr) {
         context.res = {
           status: 500,
           body: 'Could not get messages in queue'
@@ -58,7 +56,7 @@ const getQueueTrigger: AzureFunction = async (context: Context, req: HttpRequest
         return;
       }
       context.res = {
-        body: JSON.stringify(result)
+        body: JSON.stringify(peekResult)
       };
     });
   });

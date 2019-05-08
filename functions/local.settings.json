@@ -1,6 +1,9 @@
 {
   "IsEncrypted": false,
   "Values": {
-    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=ledfunctions90bb;AccountKey=pRnS5+54beT5KACoJHB4uNgUjvnxchMISt2infoyEjnU4ONqZ7ptzvZFgwqdEh+u6xVRRii2LbciLO57wdr5zA==;EndpointSuffix=core.windows.net"
+    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=ledfunctions90bb;AccountKey=pRnS5+54beT5KACoJHB4uNgUjvnxchMISt2infoyEjnU4ONqZ7ptzvZFgwqdEh+u6xVRRii2LbciLO57wdr5zA==;EndpointSuffix=core.windows.net",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "AZURE_STORAGE_QUEUE_NAME": "led-queue",
+    "AZURE_STORAGE_CONNECTION_STRING": "DefaultEndpointsProtocol=https;AccountName=brhughledstorage;AccountKey=W0V+XAwpkuIZn8jS8uiNpGC7Ubi5ELeax8EXyi6onGux4x9r8OcO2CaK0V7bYKcAJxPIZ+YBDFhFYjDjvZHQpA==;EndpointSuffix=core.windows.net"
   }
 }
