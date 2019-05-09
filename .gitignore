@@ -66,3 +66,6 @@ typings/
 
 # Powerpoint cahce
 ~$*.pptx
+
+# Azure specific things
+functions/local.settings.json
