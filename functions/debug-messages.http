@@ -1,0 +1,9 @@
+POST http://localhost:7071/api/submit-basic HTTP/1.1
+content-type: application/json
+
+{
+    "foregroundColor": "#ff0000",
+    "backgroundColor": "#ff0000",
+    "rate": 12,
+    "displayName": "Bryan"
+}

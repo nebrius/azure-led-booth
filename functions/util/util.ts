@@ -1,4 +1,3 @@
-"use strict";
 /*
 MIT License
 
@@ -22,25 +21,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.basicSubmissionSchema = {
-    properties: {
-        foregroundColor: {
-            type: 'string',
-            required: true
-        },
-        backgroundColor: {
-            type: 'string',
-            required: true
-        },
-        rate: {
-            type: 'number',
-            required: true
-        },
-        displayName: {
-            type: 'string',
-            required: true
-        },
-    }
-};
-//# sourceMappingURL=IBasicSubmission.js.map
+
+import { Context } from '@azure/functions';
+
+export function sendErrorResponse(status: number, body: string, context: Context): void {
+  context.res = { status, body };
+  context.done();
+}

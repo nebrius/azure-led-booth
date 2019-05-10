@@ -23,4 +23,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.basicSubmissionSchema = {
+    properties: {
+        foregroundColor: {
+            type: 'string',
+            required: true
+        },
+        backgroundColor: {
+            type: 'string',
+            required: true
+        },
+        rate: {
+            type: 'number',
+            required: true
+        },
+        displayName: {
+            type: 'string',
+            required: true
+        },
+    }
+};
 //# sourceMappingURL=IBasicSubmission.js.map

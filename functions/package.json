@@ -18,12 +18,14 @@
   "devDependencies": {
     "@azure/functions": "^1.0.3",
     "@types/node": "^12.0.0",
+    "@types/revalidator": "^0.3.7",
     "tslint": "^5.16.0",
     "typescript": "^3.4.5"
   },
   "author": "Bryan Hughes <bryan@nebri.us>",
   "license": "MIT",
   "dependencies": {
-    "azure-storage": "^2.10.3"
+    "azure-storage": "^2.10.3",
+    "revalidator": "^0.3.1"
   }
 }

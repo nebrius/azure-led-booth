@@ -27,32 +27,34 @@ const azure_storage_1 = require("azure-storage");
 const common_1 = require("./common/common");
 const AZURE_STORAGE_QUEUE_NAME = common_1.getEnvironmentVariable('AZURE_STORAGE_QUEUE_NAME');
 const AZURE_STORAGE_CONNECTION_STRING = common_1.getEnvironmentVariable('AZURE_STORAGE_CONNECTION_STRING');
-const getQueueTrigger = async (context, req) => {
-    context.log('HTTP trigger function processed a request.');
+const getQueueTrigger = (context, req) => {
     const userId = req.query.userId;
     context.log(userId); // TODO: integrate
     const queueService = azure_storage_1.createQueueService(AZURE_STORAGE_CONNECTION_STRING);
     queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, (createErr, createResult, createResponse) => {
-        context.log(createErr, createResult, createResponse);
         if (createErr) {
             context.res = {
                 status: 500,
                 body: 'Could not get queue'
             };
+            context.done();
             return;
         }
-        queueService.peekMessages(AZURE_STORAGE_QUEUE_NAME, { numOfMessages: 10000 }, (peekErr, peekResult, peekResponse) => {
-            context.log(peekErr, peekResult, peekResponse);
+        queueService.peekMessages(AZURE_STORAGE_QUEUE_NAME, {
+            numOfMessages: 32,
+        }, (peekErr, peekResult, peekResponse) => {
             if (peekErr) {
                 context.res = {
                     status: 500,
                     body: 'Could not get messages in queue'
                 };
+                context.done();
                 return;
             }
             context.res = {
                 body: JSON.stringify(peekResult)
             };
+            context.done();
         });
     });
 };

@@ -22,7 +22,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-module.exports = (context: any) => {
-  // function logic goes here :)
-  context.done();
+import { AzureFunction, Context, HttpRequest } from '@azure/functions';
+import { createQueueService } from 'azure-storage';
+import { validate } from 'revalidator';
+import { getEnvironmentVariable, basicSubmissionSchema } from './common/common';
+import { sendErrorResponse } from './util/util';
+
+const AZURE_STORAGE_QUEUE_NAME = getEnvironmentVariable('AZURE_STORAGE_QUEUE_NAME');
+const AZURE_STORAGE_CONNECTION_STRING = getEnvironmentVariable('AZURE_STORAGE_CONNECTION_STRING');
+
+const submitBasicTrigger: AzureFunction = (context: Context, req: HttpRequest): void => {
+
+  const message = req.body;
+  if (!validate(message, basicSubmissionSchema).valid) {
+    sendErrorResponse(400, 'Invalid animation', context);
+    return;
+  }
+
+  const queueService = createQueueService(AZURE_STORAGE_CONNECTION_STRING);
+  queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, (createErr, createResult, createResponse) => {
+    if (createErr) {
+      sendErrorResponse(500, 'Could not get queue', context);
+      return;
+    }
+    queueService.createMessage(AZURE_STORAGE_QUEUE_NAME, JSON.stringify(message), (addErr, addResult, addResponse) => {
+      if (addErr) {
+        sendErrorResponse(500, 'Could add message to queue', context);
+        return;
+      }
+      context.res = {
+        body: 'OK'
+      };
+      context.done();
+    });
+  });
 };
+
+export default submitBasicTrigger;
