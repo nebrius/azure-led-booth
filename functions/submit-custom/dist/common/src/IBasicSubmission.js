@@ -23,4 +23,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 Object.defineProperty(exports, "__esModule", { value: true });
+// Force to "any" type, otherwise TypeScript thinks the type is too strict and won't ever compile
+exports.basicSubmissionSchema = {
+    properties: {
+        foregroundColor: {
+            type: 'string',
+            pattern: '^\#[a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9]$',
+            required: true
+        },
+        backgroundColor: {
+            type: 'string',
+            pattern: '^\#[a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9]$',
+            required: true
+        },
+        rate: {
+            type: 'number',
+            multipleOf: 1.0,
+            minimum: 1,
+            maximum: 32,
+            required: true
+        },
+        displayName: {
+            type: 'string',
+            required: true
+        },
+    }
+};
 //# sourceMappingURL=IBasicSubmission.js.map

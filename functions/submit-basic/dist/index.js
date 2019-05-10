@@ -32,7 +32,7 @@ const AZURE_STORAGE_CONNECTION_STRING = common_1.getEnvironmentVariable('AZURE_S
 const submitBasicTrigger = (context, req) => {
     const message = req.body;
     if (!revalidator_1.validate(message, common_1.basicSubmissionSchema).valid) {
-        util_1.sendErrorResponse(400, 'Invalid animation', context);
+        util_1.sendErrorResponse(400, 'Invalid submission', context);
         return;
     }
     const queueService = azure_storage_1.createQueueService(AZURE_STORAGE_CONNECTION_STRING);
@@ -41,9 +41,12 @@ const submitBasicTrigger = (context, req) => {
             util_1.sendErrorResponse(500, 'Could not get queue', context);
             return;
         }
-        queueService.createMessage(AZURE_STORAGE_QUEUE_NAME, JSON.stringify(message), (addErr, addResult, addResponse) => {
+        queueService.createMessage(AZURE_STORAGE_QUEUE_NAME, JSON.stringify({
+            type: 'basic',
+            message
+        }), (addErr, addResult, addResponse) => {
             if (addErr) {
-                util_1.sendErrorResponse(500, 'Could add message to queue', context);
+                util_1.sendErrorResponse(500, 'Could not add message to queue', context);
                 return;
             }
             context.res = {

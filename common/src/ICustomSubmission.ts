@@ -24,8 +24,29 @@ SOFTWARE.
 
 import { IWaveParameters } from './IWaves';
 
+// This is what's sent from the Browser Submission to the server to add to the queue
 export interface ICustomSubmission {
-  authToken: string;
   displayName: string;
-  animation: IWaveParameters;
+  functionUrl: string;
 }
+
+// This is what's returned from the user's Azure Function when we're ready to display their animation
+export interface ICustomSubmissionResponse {
+  authToken: string;
+  waveParameters: IWaveParameters;
+}
+
+// Force to "any" type, otherwise TypeScript thinks the type is too strict and won't ever compile
+export const customSubmissionSchema: any = {
+  properties: {
+    functionUrl: {
+      type: 'string',
+      pattern: '^https\:\/\/[a-zA-Z0-9\-]*?\.azurewebsites\.net\/.*$',
+      required: true
+    },
+    displayName: {
+      type: 'string',
+      required: true
+    },
+  }
+};

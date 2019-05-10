@@ -35,7 +35,7 @@ const submitBasicTrigger: AzureFunction = (context: Context, req: HttpRequest): 
 
   const message = req.body;
   if (!validate(message, basicSubmissionSchema).valid) {
-    sendErrorResponse(400, 'Invalid animation', context);
+    sendErrorResponse(400, 'Invalid submission', context);
     return;
   }
 
@@ -45,9 +45,12 @@ const submitBasicTrigger: AzureFunction = (context: Context, req: HttpRequest): 
       sendErrorResponse(500, 'Could not get queue', context);
       return;
     }
-    queueService.createMessage(AZURE_STORAGE_QUEUE_NAME, JSON.stringify(message), (addErr, addResult, addResponse) => {
+    queueService.createMessage(AZURE_STORAGE_QUEUE_NAME, JSON.stringify({
+      type: 'basic',
+      message
+    }), (addErr, addResult, addResponse) => {
       if (addErr) {
-        sendErrorResponse(500, 'Could add message to queue', context);
+        sendErrorResponse(500, 'Could not add message to queue', context);
         return;
       }
       context.res = {

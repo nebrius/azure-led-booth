@@ -23,4 +23,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 Object.defineProperty(exports, "__esModule", { value: true });
+// Force to "any" type, otherwise TypeScript thinks the type is too strict and won't ever compile
+exports.customSubmissionSchema = {
+    properties: {
+        functionUrl: {
+            type: 'string',
+            required: true
+        },
+        displayName: {
+            type: 'string',
+            required: true
+        },
+    }
+};
 //# sourceMappingURL=ICustomSubmission.js.map
