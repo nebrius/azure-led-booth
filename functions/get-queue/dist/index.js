@@ -25,6 +25,7 @@ SOFTWARE.
 Object.defineProperty(exports, "__esModule", { value: true });
 const azure_storage_1 = require("azure-storage");
 const common_1 = require("./common/common");
+const util_1 = require("./util/util");
 const AZURE_STORAGE_QUEUE_NAME = common_1.getEnvironmentVariable('AZURE_STORAGE_QUEUE_NAME');
 const AZURE_STORAGE_CONNECTION_STRING = common_1.getEnvironmentVariable('AZURE_STORAGE_CONNECTION_STRING');
 const getQueueTrigger = (context, req) => {
@@ -33,22 +34,14 @@ const getQueueTrigger = (context, req) => {
     const queueService = azure_storage_1.createQueueService(AZURE_STORAGE_CONNECTION_STRING);
     queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, (createErr, createResult, createResponse) => {
         if (createErr) {
-            context.res = {
-                status: 500,
-                body: 'Could not get queue'
-            };
-            context.done();
+            util_1.sendErrorResponse(500, 'Could not get queue', context);
             return;
         }
         queueService.peekMessages(AZURE_STORAGE_QUEUE_NAME, {
             numOfMessages: 32,
         }, (peekErr, peekResult, peekResponse) => {
             if (peekErr) {
-                context.res = {
-                    status: 500,
-                    body: 'Could not get messages in queue'
-                };
-                context.done();
+                util_1.sendErrorResponse(500, 'Could not peek messages in queue', context);
                 return;
             }
             context.res = {

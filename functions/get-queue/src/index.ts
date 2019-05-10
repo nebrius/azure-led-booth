@@ -25,6 +25,7 @@ SOFTWARE.
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
 import { createQueueService } from 'azure-storage';
 import { getEnvironmentVariable } from './common/common';
+import { sendErrorResponse } from './util/util';
 
 const AZURE_STORAGE_QUEUE_NAME = getEnvironmentVariable('AZURE_STORAGE_QUEUE_NAME');
 const AZURE_STORAGE_CONNECTION_STRING = getEnvironmentVariable('AZURE_STORAGE_CONNECTION_STRING');
@@ -37,22 +38,14 @@ const getQueueTrigger: AzureFunction = (context: Context, req: HttpRequest): voi
   const queueService = createQueueService(AZURE_STORAGE_CONNECTION_STRING);
   queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, (createErr, createResult, createResponse) => {
     if (createErr) {
-      context.res = {
-        status: 500,
-        body: 'Could not get queue'
-      };
-      context.done();
+      sendErrorResponse(500, 'Could not get queue', context);
       return;
     }
     queueService.peekMessages(AZURE_STORAGE_QUEUE_NAME, {
       numOfMessages: 32,
     }, (peekErr, peekResult, peekResponse) => {
       if (peekErr) {
-        context.res = {
-          status: 500,
-          body: 'Could not get messages in queue'
-        };
-        context.done();
+        sendErrorResponse(500, 'Could not peek messages in queue', context);
         return;
       }
       context.res = {
