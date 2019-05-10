@@ -28,6 +28,7 @@ exports.customSubmissionSchema = {
     properties: {
         functionUrl: {
             type: 'string',
+            pattern: '^https\:\/\/[a-zA-Z0-9\-]*?\.azurewebsites\.net\/.*$',
             required: true
         },
         displayName: {
