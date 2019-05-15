@@ -23,14 +23,34 @@ SOFTWARE.
 */
 
 import { AzureFunction, Context } from '@azure/functions';
+import { createQueueService } from 'azure-storage';
+import { getEnvironmentVariable } from './common/common';
 
-const processQueueTrigger: AzureFunction = async (context: Context, myTimer: any): Promise<void> => {
-  const timeStamp = new Date().toISOString();
+const AZURE_STORAGE_QUEUE_NAME = getEnvironmentVariable('AZURE_STORAGE_QUEUE_NAME');
+const AZURE_STORAGE_CONNECTION_STRING = getEnvironmentVariable('AZURE_STORAGE_CONNECTION_STRING');
 
-  if (myTimer.IsPastDue) {
-    context.log('Timer function is running late!');
-  }
-  context.log('Timer trigger function ran!', timeStamp);
+interface ITimerRequest {
+  IsPastDue: boolean;
+}
+
+const prcoessQueueTrigger: AzureFunction = (context: Context, timer: ITimerRequest): void => {
+  const queueService = createQueueService(AZURE_STORAGE_CONNECTION_STRING);
+  queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, (createErr, createResult, createResponse) => {
+    if (createErr) {
+      context.done(new Error(`Could not get queue: ${createErr}`));
+      return;
+    }
+
+    // Ignore past due timers, because we don't want a rapid succession of animations
+    // Better to take too long than too short here.
+    if (timer.IsPastDue) {
+      context.done(new Error('Timer is past due, skipping this round until the timer infrastructure catches up'));
+      return;
+    }
+
+    // TODO: logic here
+    context.done();
+  });
 };
 
-export default processQueueTrigger;
+export default prcoessQueueTrigger;

@@ -1,10 +1,11 @@
 {
   "bindings": [
     {
-      "name": "timer",
+      "name": "myTimer",
       "type": "timerTrigger",
       "direction": "in",
-      "schedule": "*/5 * * * * *"
+      "schedule": "0 */1 * * * *",
+      "useMonitor": true
     }
   ],
   "scriptFile": "./dist/index.js"

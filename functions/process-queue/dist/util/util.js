@@ -23,26 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 Object.defineProperty(exports, "__esModule", { value: true });
-const azure_storage_1 = require("azure-storage");
-const common_1 = require("./common/common");
-const AZURE_STORAGE_QUEUE_NAME = common_1.getEnvironmentVariable('AZURE_STORAGE_QUEUE_NAME');
-const AZURE_STORAGE_CONNECTION_STRING = common_1.getEnvironmentVariable('AZURE_STORAGE_CONNECTION_STRING');
-const prcoessQueueTrigger = (context, timer) => {
-    const queueService = azure_storage_1.createQueueService(AZURE_STORAGE_CONNECTION_STRING);
-    queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, (createErr, createResult, createResponse) => {
-        if (createErr) {
-            context.done(new Error(`Could not get queue: ${createErr}`));
-            return;
-        }
-        // Ignore past due timers, because we don't want a rapid succession of animations
-        // Better to take too long than too short here.
-        if (timer.IsPastDue) {
-            context.done(new Error('Timer is past due, skipping this round until the timer infrastructure catches up'));
-            return;
-        }
-        // TODO: logic here
-        context.done();
-    });
-};
-exports.default = prcoessQueueTrigger;
-//# sourceMappingURL=index.js.map
+function sendErrorResponse(status, body, context) {
+    context.res = { status, body };
+    context.done();
+}
+exports.sendErrorResponse = sendErrorResponse;
+//# sourceMappingURL=util.js.map
