@@ -2,6 +2,11 @@
 
 An LED art piece for conference booths that attendees can control from Azure. This project is, in part, based on @nebrius [Raver Lights](https://github.com/nebrius/raver-lights) project.
 
+This project touches on a few other repos of interest:
+
+- https://github.com/nebrius/rvl-node-animations A helper library for creating animations
+- TODO: starter repo link
+
 # License
 
 MIT License
