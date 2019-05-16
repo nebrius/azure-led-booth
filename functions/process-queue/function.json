@@ -5,7 +5,8 @@
       "type": "timerTrigger",
       "direction": "in",
       "schedule": "0 */1 * * * *",
-      "useMonitor": true
+      "useMonitor": true,
+      "runOnStartup": false
     }
   ],
   "scriptFile": "./dist/index.js"

@@ -40,13 +40,14 @@ interface ITimerRequest {
 
 function sendAnimation(animation: IWaveParameters, cb: ErrorCallback): void {
   // TODO
+  setImmediate(cb);
 }
 
-const COLOR_REGEX = /^\#([0-9][0-9])([0-9][0-9])([0-9][0-9])$/;
-function parseColor(str: string): { h: number, s: number, v: number } {
+const COLOR_REGEX = /^\#([0-9a-zA-Z][0-9a-zA-Z])([0-9a-zA-Z][0-9a-zA-Z])([0-9a-zA-Z][0-9a-zA-Z])$/;
+function parseColor(str: string): { h: number, s: number, v: number } | undefined {
   const color = COLOR_REGEX.exec(str);
   if (!color) {
-    throw new Error(`Invalid color string ${str}`);
+    return undefined;
   }
   const [ , r, g, b] = color;
   const [ h, s, v ] = rgb.hsv([ parseInt(r, 16), parseInt(g, 16), parseInt(b, 16) ]);
@@ -131,39 +132,39 @@ const prcoessQueueTrigger: AzureFunction = (context: Context, timer: ITimerReque
           });
         }
 
+        let entry: IQueueEntry;
         try {
-          const entry: IQueueEntry = JSON.parse(messageText);
-          context.log(entry);
-          switch (entry.type) {
-            case QueueType.Basic: {
-              processBasicAnimation(entry as IBasicQueueEntry, (err) => {
-                if (err) {
-                  context.done(new Error(`Could not process basic animation: ${err}`));
-                } else {
-                  context.done();
-                }
-              });
-              break;
-            }
-            case QueueType.Custom: {
-              processCustomAnimation(entry as ICustomQueueEntry, (err) => {
-                if (err) {
-                  context.done(new Error(`Could not process basic animation: ${err}`));
-                } else {
-                  context.done();
-                }
-              });
-              break;
-            }
-            default: {
-              context.log(`Error: invalid animation queue type ${entry.type}, skipping animation`);
-              finalize(processMessage);
-            }
-          }
+          entry = JSON.parse(messageText);
         } catch (e) {
           context.log(`Error: could not parse message, skipping animation: ${e}`);
           finalize(processMessage);
           return;
+        }
+        switch (entry.type) {
+          case QueueType.Basic: {
+            processBasicAnimation(entry as IBasicQueueEntry, (err) => {
+              if (err) {
+                finalize(() => context.done(new Error(`Could not process basic animation: ${err}`)));
+              } else {
+                finalize(() => context.done());
+              }
+            });
+            break;
+          }
+          case QueueType.Custom: {
+            processCustomAnimation(entry as ICustomQueueEntry, (err) => {
+              if (err) {
+                finalize(() => context.done(new Error(`Could not process basic animation: ${err}`)));
+              } else {
+                finalize(() => context.done());
+              }
+            });
+            break;
+          }
+          default: {
+            context.log(`Error: invalid animation queue type ${entry.type}, skipping animation`);
+            finalize(processMessage);
+          }
         }
       });
     }

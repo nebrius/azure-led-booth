@@ -31,12 +31,13 @@ const AZURE_STORAGE_QUEUE_NAME = common_1.getEnvironmentVariable('AZURE_STORAGE_
 const AZURE_STORAGE_CONNECTION_STRING = common_1.getEnvironmentVariable('AZURE_STORAGE_CONNECTION_STRING');
 function sendAnimation(animation, cb) {
     // TODO
+    setImmediate(cb);
 }
-const COLOR_REGEX = /^\#([0-9][0-9])([0-9][0-9])([0-9][0-9])$/;
+const COLOR_REGEX = /^\#([0-9a-zA-Z][0-9a-zA-Z])([0-9a-zA-Z][0-9a-zA-Z])([0-9a-zA-Z][0-9a-zA-Z])$/;
 function parseColor(str) {
     const color = COLOR_REGEX.exec(str);
     if (!color) {
-        throw new Error(`Invalid color string ${str}`);
+        return undefined;
     }
     const [, r, g, b] = color;
     const [h, s, v] = color_convert_1.rgb.hsv([parseInt(r, 16), parseInt(g, 16), parseInt(b, 16)]);
@@ -112,42 +113,42 @@ const prcoessQueueTrigger = (context, timer) => {
                         cb();
                     });
                 }
+                let entry;
                 try {
-                    const entry = JSON.parse(messageText);
-                    context.log(entry);
-                    switch (entry.type) {
-                        case common_1.QueueType.Basic: {
-                            processBasicAnimation(entry, (err) => {
-                                if (err) {
-                                    context.done(new Error(`Could not process basic animation: ${err}`));
-                                }
-                                else {
-                                    context.done();
-                                }
-                            });
-                            break;
-                        }
-                        case common_1.QueueType.Custom: {
-                            processCustomAnimation(entry, (err) => {
-                                if (err) {
-                                    context.done(new Error(`Could not process basic animation: ${err}`));
-                                }
-                                else {
-                                    context.done();
-                                }
-                            });
-                            break;
-                        }
-                        default: {
-                            context.log(`Error: invalid animation queue type ${entry.type}, skipping animation`);
-                            finalize(processMessage);
-                        }
-                    }
+                    entry = JSON.parse(messageText);
                 }
                 catch (e) {
                     context.log(`Error: could not parse message, skipping animation: ${e}`);
                     finalize(processMessage);
                     return;
+                }
+                switch (entry.type) {
+                    case common_1.QueueType.Basic: {
+                        processBasicAnimation(entry, (err) => {
+                            if (err) {
+                                finalize(() => context.done(new Error(`Could not process basic animation: ${err}`)));
+                            }
+                            else {
+                                finalize(() => context.done());
+                            }
+                        });
+                        break;
+                    }
+                    case common_1.QueueType.Custom: {
+                        processCustomAnimation(entry, (err) => {
+                            if (err) {
+                                finalize(() => context.done(new Error(`Could not process basic animation: ${err}`)));
+                            }
+                            else {
+                                finalize(() => context.done());
+                            }
+                        });
+                        break;
+                    }
+                    default: {
+                        context.log(`Error: invalid animation queue type ${entry.type}, skipping animation`);
+                        finalize(processMessage);
+                    }
                 }
             });
         }
