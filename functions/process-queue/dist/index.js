@@ -111,8 +111,15 @@ const prcoessQueueTrigger = (context, timer) => {
             // Dequeue the message from the queue, but leave it there. We'll delete it later once we're done processing it.
             // This approach allows us to leave it in the queue but mark it so no one else can process it.
             queueService.getMessage(AZURE_STORAGE_QUEUE_NAME, (getErr, message) => {
-                if (getErr || !message) {
+                // This means there was an error getting the messages, and we should report it as an error
+                if (getErr) {
                     context.done(new Error(`Could not get message, bailing: ${getErr}`));
+                    return;
+                }
+                // This means there are no messages to get, so let's just make a note but not error
+                if (!message) {
+                    context.log('No messages in queue, sticking with the current animation');
+                    context.done();
                     return;
                 }
                 const { messageId, popReceipt, messageText } = message;
