@@ -1,3 +1,4 @@
+"use strict";
 /*
 MIT License
 
@@ -21,24 +22,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-
-export interface IWaveChannel {
-  a: number; // Default 0
-  b: number; // Default 0
-  w_t: number; // Default 0
-  w_x: number; // Default 0
-  phi: number; // Default 0
-}
-
-export interface IWave {
-  h: IWaveChannel;
-  s: IWaveChannel;
-  v: IWaveChannel;
-  a: IWaveChannel;
-}
-
-export interface IWaveParameters {
-  timePeriod?: number; // Default 255
-  distancePeriod?: number; // Default 32
-  waves: IWave[];
-}
+Object.defineProperty(exports, "__esModule", { value: true });
+var QueueType;
+(function (QueueType) {
+    QueueType[QueueType["Custom"] = 0] = "Custom";
+    QueueType[QueueType["Basic"] = 1] = "Basic";
+})(QueueType = exports.QueueType || (exports.QueueType = {}));
+//# sourceMappingURL=IQueue.js.map

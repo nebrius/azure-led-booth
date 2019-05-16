@@ -29,4 +29,5 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./src/util"));
 __export(require("./src/IBasicSubmission"));
 __export(require("./src/ICustomSubmission"));
+__export(require("./src/IQueue"));
 //# sourceMappingURL=common.js.map

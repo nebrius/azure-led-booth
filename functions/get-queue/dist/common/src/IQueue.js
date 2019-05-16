@@ -1,3 +1,4 @@
+"use strict";
 /*
 MIT License
 
@@ -21,11 +22,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-
-import { IWaveParameters } from './IWaves';
-
-export interface IAnimation {
-  animation: IWaveParameters;
-  displayName: string | undefined;
-  userId: string;
-}
+Object.defineProperty(exports, "__esModule", { value: true });
+var QueueType;
+(function (QueueType) {
+    QueueType[QueueType["Custom"] = 0] = "Custom";
+    QueueType[QueueType["Basic"] = 1] = "Basic";
+})(QueueType = exports.QueueType || (exports.QueueType = {}));
+//# sourceMappingURL=IQueue.js.map

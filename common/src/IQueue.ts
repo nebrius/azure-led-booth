@@ -22,31 +22,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import { IWaveParameters } from 'rvl-node-types';
+import { IBasicSubmission } from './IBasicSubmission';
+import { ICustomSubmission } from './ICustomSubmission';
 
-// This is what's sent from the Azure Function creator's browser to the server to add to the queue
-export interface ICustomSubmission {
+export enum QueueType {
+  Custom,
+  Basic
+}
+
+export interface IQueueEntry {
+  type: QueueType;
   displayName: string;
-  authToken: string;
-  functionUrl: string;
 }
 
-// This is what's returned from the user's Azure Function when we're ready to display their animation
-export interface ICustomSubmissionResponse {
-  waveParameters: IWaveParameters;
+export interface IBasicQueueEntry extends IQueueEntry {
+  type: QueueType.Basic;
+  submission: IBasicSubmission;
 }
 
-// Force to "any" type, otherwise TypeScript thinks the type is too strict and won't ever compile
-export const customSubmissionSchema: any = {
-  properties: {
-    functionUrl: {
-      type: 'string',
-      pattern: '^https\:\/\/[a-zA-Z0-9\-]*?\.azurewebsites\.net\/.*$',
-      required: true
-    },
-    displayName: {
-      type: 'string',
-      required: true
-    },
-  }
-};
+export interface ICustomQueueEntry extends IQueueEntry {
+  type: QueueType.Basic;
+  userId: string;
+  submission: ICustomSubmission;
+}
