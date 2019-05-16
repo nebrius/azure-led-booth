@@ -36,7 +36,7 @@ import {
   ICustomSubmissionResponse
 } from './common/common';
 import { IWaveParameters } from 'rvl-node-types';
-import { createWaveParameters, createMovingWave, createSolidColorWave } from 'rvl-node-animations';
+import { createWaveParameters, createMovingWave, createSolidColorWave, createPulsingWave } from 'rvl-node-animations';
 import { rgb } from 'color-convert';
 import fetch from 'node-fetch';
 
@@ -117,6 +117,20 @@ async function processCustomAnimation(entry: ICustomQueueEntry) {
   await sendAnimation(message.waveParameters);
 }
 
+async function processDefaultAnimation() {
+  const animation = createWaveParameters(
+    // Create the moving wave on top
+    createMovingWave(200, 255, 8, 2),
+
+    // Creating a pulsing green on top of the blue, but below the purple
+    createPulsingWave(55, 255, 16),
+
+    // Create the solid blue on bottom
+    createSolidColorWave(120, 255, 255, 255)
+  );
+  await sendAnimation(animation);
+}
+
 const prcoessQueueTrigger: AzureFunction = (context: Context, timer: ITimerRequest): void => {
   const queueService = createQueueService(AZURE_STORAGE_CONNECTION_STRING);
   queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, (createErr, createResult, createResponse) => {
@@ -142,10 +156,17 @@ const prcoessQueueTrigger: AzureFunction = (context: Context, timer: ITimerReque
           return;
         }
 
-        // This means there are no messages to get, so let's just make a note but not error
+        // This means there are no messages to get, so let's show the default animation
         if (!message) {
-          context.log('No messages in queue, sticking with the current animation');
-          context.done();
+          context.log('No messages in queue, running default animation');
+          processDefaultAnimation()
+            .then(() => {
+              context.log('Default animation sent to the device');
+              context.done();
+            })
+            .catch((err: Error) => {
+              context.log(`Could not process default animation, skipping animation: ${err.message}`);
+            });
           return;
         }
 
@@ -185,7 +206,10 @@ const prcoessQueueTrigger: AzureFunction = (context: Context, timer: ITimerReque
         switch (entry.type) {
           case QueueType.Basic: {
             processBasicAnimation(entry as IBasicQueueEntry)
-              .then(() => finalize(() => context.done()))
+              .then(() => {
+                context.log('Basic animation sent to the device');
+                finalize(() => context.done());
+              })
               .catch((err: Error) => {
                 context.log(`Could not process basic animation, skipping animation: ${err.message}`);
                 finalize(processMessage);
@@ -194,7 +218,10 @@ const prcoessQueueTrigger: AzureFunction = (context: Context, timer: ITimerReque
           }
           case QueueType.Custom: {
             processCustomAnimation(entry as ICustomQueueEntry)
-              .then(() => finalize(() => context.done()))
+              .then(() => {
+                context.log('Custom animation sent to the device');
+                finalize(() => context.done());
+              })
               .catch((err: Error) => {
                 context.log(`Could not process custom animation, skipping animation: ${err.message}`);
                 finalize(processMessage);

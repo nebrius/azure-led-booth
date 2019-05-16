@@ -94,6 +94,16 @@ async function processCustomAnimation(entry) {
     }
     await sendAnimation(message.waveParameters);
 }
+async function processDefaultAnimation() {
+    const animation = rvl_node_animations_1.createWaveParameters(
+    // Create the moving wave on top
+    rvl_node_animations_1.createMovingWave(200, 255, 8, 2), 
+    // Creating a pulsing green on top of the blue, but below the purple
+    rvl_node_animations_1.createPulsingWave(55, 255, 16), 
+    // Create the solid blue on bottom
+    rvl_node_animations_1.createSolidColorWave(120, 255, 255, 255));
+    await sendAnimation(animation);
+}
 const prcoessQueueTrigger = (context, timer) => {
     const queueService = azure_storage_1.createQueueService(AZURE_STORAGE_CONNECTION_STRING);
     queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, (createErr, createResult, createResponse) => {
@@ -116,10 +126,17 @@ const prcoessQueueTrigger = (context, timer) => {
                     context.done(new Error(`Could not get message, bailing: ${getErr}`));
                     return;
                 }
-                // This means there are no messages to get, so let's just make a note but not error
+                // This means there are no messages to get, so let's show the default animation
                 if (!message) {
-                    context.log('No messages in queue, sticking with the current animation');
-                    context.done();
+                    context.log('No messages in queue, running default animation');
+                    processDefaultAnimation()
+                        .then(() => {
+                        context.log('Default animation sent to the device');
+                        context.done();
+                    })
+                        .catch((err) => {
+                        context.log(`Could not process default animation, skipping animation: ${err.message}`);
+                    });
                     return;
                 }
                 const { messageId, popReceipt, messageText } = message;
@@ -157,7 +174,10 @@ const prcoessQueueTrigger = (context, timer) => {
                 switch (entry.type) {
                     case common_1.QueueType.Basic: {
                         processBasicAnimation(entry)
-                            .then(() => finalize(() => context.done()))
+                            .then(() => {
+                            context.log('Basic animation sent to the device');
+                            finalize(() => context.done());
+                        })
                             .catch((err) => {
                             context.log(`Could not process basic animation, skipping animation: ${err.message}`);
                             finalize(processMessage);
@@ -166,7 +186,10 @@ const prcoessQueueTrigger = (context, timer) => {
                     }
                     case common_1.QueueType.Custom: {
                         processCustomAnimation(entry)
-                            .then(() => finalize(() => context.done()))
+                            .then(() => {
+                            context.log('Custom animation sent to the device');
+                            finalize(() => context.done());
+                        })
                             .catch((err) => {
                             context.log(`Could not process custom animation, skipping animation: ${err.message}`);
                             finalize(processMessage);
