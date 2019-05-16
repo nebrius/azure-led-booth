@@ -97,11 +97,11 @@ async function processCustomAnimation(entry) {
 async function processDefaultAnimation() {
     const animation = rvl_node_animations_1.createWaveParameters(
     // Create the moving wave on top
-    rvl_node_animations_1.createMovingWave(200, 255, 8, 2), 
+    rvl_node_animations_1.createMovingWave(215, 255, 8, 2), 
     // Creating a pulsing green on top of the blue, but below the purple
-    rvl_node_animations_1.createPulsingWave(55, 255, 16), 
+    rvl_node_animations_1.createPulsingWave(85, 255, 2), 
     // Create the solid blue on bottom
-    rvl_node_animations_1.createSolidColorWave(120, 255, 255, 255));
+    rvl_node_animations_1.createSolidColorWave(170, 255, 255, 255));
     await sendAnimation(animation);
 }
 const prcoessQueueTrigger = (context, timer) => {

@@ -120,13 +120,13 @@ async function processCustomAnimation(entry: ICustomQueueEntry) {
 async function processDefaultAnimation() {
   const animation = createWaveParameters(
     // Create the moving wave on top
-    createMovingWave(200, 255, 8, 2),
+    createMovingWave(215, 255, 8, 2),
 
     // Creating a pulsing green on top of the blue, but below the purple
-    createPulsingWave(55, 255, 16),
+    createPulsingWave(85, 255, 2),
 
     // Create the solid blue on bottom
-    createSolidColorWave(120, 255, 255, 255)
+    createSolidColorWave(170, 255, 255, 255)
   );
   await sendAnimation(animation);
 }
