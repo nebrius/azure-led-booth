@@ -69,3 +69,6 @@ typings/
 
 # Azure specific things
 functions/local.settings.json
+
+# VS Code specific things
+.vscode/launch.json
