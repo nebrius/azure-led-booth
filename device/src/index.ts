@@ -21,13 +21,10 @@ import { Client } from 'azure-iot-device';
 import { Mqtt as Protocol } from 'azure-iot-device-mqtt';
 import { RVL, IWaveParameters } from 'rvl-node';
 import equals = require('deep-equal');
+import { getEnvironmentVariable } from './common/common';
 
-const IOT_HUB_DEVICE_CONNECTION_STRING = process.env.IOT_HUB_DEVICE_CONNECTION_STRING;
-if (typeof IOT_HUB_DEVICE_CONNECTION_STRING !== 'string') {
-  throw new Error('Environment variable IOT_HUB_DEVICE_CONNECTION_STRING is not defined');
-}
-
-const RAVER_LIGHTS_INTERFACE = 'wlan0';
+const IOT_HUB_DEVICE_CONNECTION_STRING = getEnvironmentVariable('IOT_HUB_DEVICE_CONNECTION_STRING');
+const RAVER_LIGHTS_INTERFACE = getEnvironmentVariable('RAVER_LIGHTS_INTERFACE');
 
 const rvl = new RVL({
   networkInterface: RAVER_LIGHTS_INTERFACE,
@@ -36,15 +33,8 @@ const rvl = new RVL({
   logLevel: 'debug'
 });
 
-interface IConfig {
-  animation: IWaveParameters;
-}
-
-console.log('Starting RVL');
-rvl.on('initialized', () => {
-  rvl.start();
-
-  console.log('Connecting to IoT Hub');
+function connectToIoTHub(): void {
+  console.log('Connecting to IoT Hub...');
   const client = Client.fromConnectionString(IOT_HUB_DEVICE_CONNECTION_STRING, Protocol);
   client.open((openErr) => {
     if (openErr) {
@@ -54,35 +44,26 @@ rvl.on('initialized', () => {
     }
 
     client.on('error', (err) => console.error(err));
-    client.on('disconnect', () => client.removeAllListeners());
-
-    client.getTwin((getTwinErr, twin) => {
-      if (getTwinErr || !twin) {
-        console.error(getTwinErr || new Error('Could not get device Twin, exiting'));
-        process.exit(-1);
-        return;
-      }
-
-      twin.properties.reported.config = JSON.stringify({
-        animation: rvl.waveParameters
-      });
-
-      // Read configuration changes from the cloud to the device
-      twin.on('properties.desired', (desiredChange) => {
-
-        // Validate the incoming data and see if there are any changes, if so save it
-        const newConfig: IConfig = JSON.parse(desiredChange.config);
-        if (!equals(rvl.waveParameters, newConfig.animation)) {
-          rvl.setWaveParameters(newConfig.animation);
-        }
-
-        // Check if we don't need to acknowledge receipt of the changes and skip if so
-        if (twin.properties.desired.$version === twin.properties.reported.$version) {
-          return;
-        }
-      });
-
-      console.log('Connected to IoT Hub');
+    client.on('disconnect', () => {
+      console.warn('Disconnected from IoT Hub, reconnecting...');
+      client.removeAllListeners();
+      setImmediate(connectToIoTHub);
     });
+
+    client.on('message', (msg) => {
+      const newConfig: IWaveParameters = JSON.parse(msg.data.toString());
+      if (!equals(rvl.waveParameters, newConfig)) {
+        console.log('Setting new wave paramters');
+        console.debug(newConfig);
+        rvl.setWaveParameters(newConfig);
+      }
+    });
+    console.log('Connected to IoT Hub');
   });
+}
+
+console.log('Starting RVL');
+rvl.on('initialized', () => {
+  rvl.start();
+  connectToIoTHub();
 });
