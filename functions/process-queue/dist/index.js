@@ -23,15 +23,35 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 Object.defineProperty(exports, "__esModule", { value: true });
+const azure_iothub_1 = require("azure-iothub");
 const azure_storage_1 = require("azure-storage");
+const revalidator_1 = require("revalidator");
 const common_1 = require("./common/common");
 const rvl_node_animations_1 = require("rvl-node-animations");
 const color_convert_1 = require("color-convert");
+const node_fetch_1 = require("node-fetch");
+const IOT_HUB_CONNECTION_STRING = common_1.getEnvironmentVariable('IOT_HUB_CONNECTION_STRING');
+const IOT_HUB_DEVICE_ID = common_1.getEnvironmentVariable('IOT_HUB_DEVICE_ID');
 const AZURE_STORAGE_QUEUE_NAME = common_1.getEnvironmentVariable('AZURE_STORAGE_QUEUE_NAME');
 const AZURE_STORAGE_CONNECTION_STRING = common_1.getEnvironmentVariable('AZURE_STORAGE_CONNECTION_STRING');
-function sendAnimation(animation, cb) {
-    // TODO
-    setImmediate(cb);
+async function sendAnimation(animation) {
+    return new Promise((resolve, reject) => {
+        const client = azure_iothub_1.Client.fromConnectionString(IOT_HUB_CONNECTION_STRING);
+        client.open((openErr) => {
+            if (openErr) {
+                reject(openErr);
+                return;
+            }
+            client.send(IOT_HUB_DEVICE_ID, JSON.stringify(animation), (sendErr) => {
+                if (sendErr) {
+                    reject(sendErr);
+                }
+                else {
+                    resolve();
+                }
+            });
+        });
+    });
 }
 const COLOR_REGEX = /^\#([0-9a-zA-Z][0-9a-zA-Z])([0-9a-zA-Z][0-9a-zA-Z])([0-9a-zA-Z][0-9a-zA-Z])$/;
 function parseColor(str) {
@@ -47,16 +67,14 @@ function parseColor(str) {
         v: Math.round(255 * v / 100)
     };
 }
-function processBasicAnimation(entry, cb) {
+async function processBasicAnimation(entry) {
     const foregroundColor = parseColor(entry.submission.foregroundColor);
-    const backgroundColor = parseColor(entry.submission.backgroundColor);
     if (!foregroundColor) {
-        cb(new Error(`Invalid foreground color ${foregroundColor}`));
-        return;
+        throw new Error(`Invalid foreground color ${foregroundColor}`);
     }
+    const backgroundColor = parseColor(entry.submission.backgroundColor);
     if (!backgroundColor) {
-        cb(new Error(`Invalid background color ${backgroundColor}`));
-        return;
+        throw new Error(`Invalid background color ${backgroundColor}`);
     }
     const rate = entry.submission.rate;
     const animation = rvl_node_animations_1.createWaveParameters(
@@ -64,10 +82,17 @@ function processBasicAnimation(entry, cb) {
     rvl_node_animations_1.createMovingWave(foregroundColor.h, foregroundColor.s, rate, 2), 
     // Create the solid color on bottom
     rvl_node_animations_1.createSolidColorWave(backgroundColor.h, backgroundColor.s, backgroundColor.v, 255));
-    sendAnimation(animation, cb);
+    await sendAnimation(animation);
 }
-function processCustomAnimation(entry, cb) {
-    // TODO
+async function processCustomAnimation(entry) {
+    const endpoint = new URL(entry.submission.functionUrl);
+    endpoint.searchParams.append('authToken', entry.submission.authToken);
+    const response = await node_fetch_1.default(URL.createObjectURL(endpoint));
+    const message = await response.json();
+    if (!revalidator_1.validate(message, common_1.customSubmissionResponseSchema).valid) {
+        throw new Error(`Received invalid response from user Function, skipping: ${message}`);
+    }
+    await sendAnimation(message.waveParameters);
 }
 const prcoessQueueTrigger = (context, timer) => {
     const queueService = azure_storage_1.createQueueService(AZURE_STORAGE_CONNECTION_STRING);
@@ -86,7 +111,7 @@ const prcoessQueueTrigger = (context, timer) => {
             // Dequeue the message from the queue, but leave it there. We'll delete it later once we're done processing it.
             // This approach allows us to leave it in the queue but mark it so no one else can process it.
             queueService.getMessage(AZURE_STORAGE_QUEUE_NAME, (getErr, message) => {
-                if (getErr) {
+                if (getErr || !message) {
                     context.done(new Error(`Could not get message, bailing: ${getErr}`));
                     return;
                 }
@@ -124,24 +149,20 @@ const prcoessQueueTrigger = (context, timer) => {
                 }
                 switch (entry.type) {
                     case common_1.QueueType.Basic: {
-                        processBasicAnimation(entry, (err) => {
-                            if (err) {
-                                finalize(() => context.done(new Error(`Could not process basic animation: ${err}`)));
-                            }
-                            else {
-                                finalize(() => context.done());
-                            }
+                        processBasicAnimation(entry)
+                            .then(() => finalize(() => context.done()))
+                            .catch((err) => {
+                            context.log(`Could not process basic animation, skipping animation: ${err.message}`);
+                            finalize(processMessage);
                         });
                         break;
                     }
                     case common_1.QueueType.Custom: {
-                        processCustomAnimation(entry, (err) => {
-                            if (err) {
-                                finalize(() => context.done(new Error(`Could not process basic animation: ${err}`)));
-                            }
-                            else {
-                                finalize(() => context.done());
-                            }
+                        processCustomAnimation(entry)
+                            .then(() => finalize(() => context.done()))
+                            .catch((err) => {
+                            context.log(`Could not process custom animation, skipping animation: ${err.message}`);
+                            finalize(processMessage);
                         });
                         break;
                     }

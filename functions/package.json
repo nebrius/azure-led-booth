@@ -19,6 +19,7 @@
     "@azure/functions": "^1.0.3",
     "@types/color-convert": "^1.9.0",
     "@types/node": "^12.0.0",
+    "@types/node-fetch": "^2.3.4",
     "@types/revalidator": "^0.3.7",
     "rvl-node-types": "^1.0.0",
     "tslint": "^5.16.0",
@@ -27,8 +28,10 @@
   "author": "Bryan Hughes <bryan@nebri.us>",
   "license": "MIT",
   "dependencies": {
+    "azure-iothub": "^1.9.9",
     "azure-storage": "^2.10.3",
     "color-convert": "^2.0.0",
+    "node-fetch": "^2.6.0",
     "revalidator": "^0.3.1",
     "rvl-node-animations": "^1.0.0"
   }

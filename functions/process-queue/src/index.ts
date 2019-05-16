@@ -22,28 +22,54 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+import { Client } from 'azure-iothub';
 import { AzureFunction, Context } from '@azure/functions';
 import { createQueueService } from 'azure-storage';
-import { getEnvironmentVariable, IQueueEntry, QueueType, IBasicQueueEntry, ICustomQueueEntry } from './common/common';
+import { validate } from 'revalidator';
+import {
+  getEnvironmentVariable,
+  IQueueEntry,
+  QueueType,
+  IBasicQueueEntry,
+  ICustomQueueEntry,
+  customSubmissionResponseSchema,
+  ICustomSubmissionResponse
+} from './common/common';
 import { IWaveParameters } from 'rvl-node-types';
 import { createWaveParameters, createMovingWave, createSolidColorWave } from 'rvl-node-animations';
 import { rgb } from 'color-convert';
+import fetch from 'node-fetch';
 
+const IOT_HUB_CONNECTION_STRING = getEnvironmentVariable('IOT_HUB_CONNECTION_STRING');
+const IOT_HUB_DEVICE_ID = getEnvironmentVariable('IOT_HUB_DEVICE_ID');
 const AZURE_STORAGE_QUEUE_NAME = getEnvironmentVariable('AZURE_STORAGE_QUEUE_NAME');
 const AZURE_STORAGE_CONNECTION_STRING = getEnvironmentVariable('AZURE_STORAGE_CONNECTION_STRING');
-
-type ErrorCallback = (err: Error | undefined) => void;
 
 interface ITimerRequest {
   IsPastDue: boolean;
 }
 
-function sendAnimation(animation: IWaveParameters, cb: ErrorCallback): void {
-  // TODO
-  setImmediate(cb);
+async function sendAnimation(animation: IWaveParameters) {
+  return new Promise((resolve, reject) => {
+    const client = Client.fromConnectionString(IOT_HUB_CONNECTION_STRING);
+    client.open((openErr) => {
+      if (openErr) {
+        reject(openErr);
+        return;
+      }
+      client.send(IOT_HUB_DEVICE_ID, JSON.stringify(animation), (sendErr) => {
+        if (sendErr) {
+          reject(sendErr);
+        } else {
+          resolve();
+        }
+      });
+    });
+  });
 }
 
 const COLOR_REGEX = /^\#([0-9a-zA-Z][0-9a-zA-Z])([0-9a-zA-Z][0-9a-zA-Z])([0-9a-zA-Z][0-9a-zA-Z])$/;
+
 function parseColor(str: string): { h: number, s: number, v: number } | undefined {
   const color = COLOR_REGEX.exec(str);
   if (!color) {
@@ -58,16 +84,14 @@ function parseColor(str: string): { h: number, s: number, v: number } | undefine
   };
 }
 
-function processBasicAnimation(entry: IBasicQueueEntry, cb: ErrorCallback): void {
+async function processBasicAnimation(entry: IBasicQueueEntry) {
   const foregroundColor = parseColor(entry.submission.foregroundColor);
-  const backgroundColor = parseColor(entry.submission.backgroundColor);
   if (!foregroundColor) {
-    cb(new Error(`Invalid foreground color ${foregroundColor}`));
-    return;
+    throw new Error(`Invalid foreground color ${foregroundColor}`);
   }
+  const backgroundColor = parseColor(entry.submission.backgroundColor);
   if (!backgroundColor) {
-    cb(new Error(`Invalid background color ${backgroundColor}`));
-    return;
+    throw new Error(`Invalid background color ${backgroundColor}`);
   }
   const rate = entry.submission.rate;
   const animation = createWaveParameters(
@@ -77,11 +101,20 @@ function processBasicAnimation(entry: IBasicQueueEntry, cb: ErrorCallback): void
     // Create the solid color on bottom
     createSolidColorWave(backgroundColor.h, backgroundColor.s, backgroundColor.v, 255)
   );
-  sendAnimation(animation, cb);
+  await sendAnimation(animation);
 }
 
-function processCustomAnimation(entry: ICustomQueueEntry, cb: ErrorCallback): void {
-  // TODO
+async function processCustomAnimation(entry: ICustomQueueEntry) {
+  const endpoint = new URL(entry.submission.functionUrl);
+  endpoint.searchParams.append('authToken', entry.submission.authToken);
+
+  const response = await fetch(URL.createObjectURL(endpoint));
+  const message: ICustomSubmissionResponse = await response.json();
+  if (!validate(message, customSubmissionResponseSchema).valid) {
+    throw new Error(`Received invalid response from user Function, skipping: ${message}`);
+  }
+
+  await sendAnimation(message.waveParameters);
 }
 
 const prcoessQueueTrigger: AzureFunction = (context: Context, timer: ITimerRequest): void => {
@@ -103,7 +136,7 @@ const prcoessQueueTrigger: AzureFunction = (context: Context, timer: ITimerReque
       // Dequeue the message from the queue, but leave it there. We'll delete it later once we're done processing it.
       // This approach allows us to leave it in the queue but mark it so no one else can process it.
       queueService.getMessage(AZURE_STORAGE_QUEUE_NAME, (getErr, message) => {
-        if (getErr) {
+        if (getErr || !message) {
           context.done(new Error(`Could not get message, bailing: ${getErr}`));
           return;
         }
@@ -142,23 +175,21 @@ const prcoessQueueTrigger: AzureFunction = (context: Context, timer: ITimerReque
         }
         switch (entry.type) {
           case QueueType.Basic: {
-            processBasicAnimation(entry as IBasicQueueEntry, (err) => {
-              if (err) {
-                finalize(() => context.done(new Error(`Could not process basic animation: ${err}`)));
-              } else {
-                finalize(() => context.done());
-              }
-            });
+            processBasicAnimation(entry as IBasicQueueEntry)
+              .then(() => finalize(() => context.done()))
+              .catch((err: Error) => {
+                context.log(`Could not process basic animation, skipping animation: ${err.message}`);
+                finalize(processMessage);
+              });
             break;
           }
           case QueueType.Custom: {
-            processCustomAnimation(entry as ICustomQueueEntry, (err) => {
-              if (err) {
-                finalize(() => context.done(new Error(`Could not process basic animation: ${err}`)));
-              } else {
-                finalize(() => context.done());
-              }
-            });
+            processCustomAnimation(entry as ICustomQueueEntry)
+              .then(() => finalize(() => context.done()))
+              .catch((err: Error) => {
+                context.log(`Could not process custom animation, skipping animation: ${err.message}`);
+                finalize(processMessage);
+              });
             break;
           }
           default: {
