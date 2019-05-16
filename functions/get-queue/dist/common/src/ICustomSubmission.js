@@ -37,4 +37,81 @@ exports.customSubmissionSchema = {
         },
     }
 };
+// Force to "any" type, otherwise TypeScript thinks the type is too strict and won't ever compile
+exports.customSubmissionResponseSchema = {
+    properties: {
+        waveParameters: {
+            type: 'object',
+            properties: {
+                timePeriod: {
+                    type: 'number',
+                    multipleOf: 1.0,
+                    minimum: 1,
+                    maximum: 32,
+                    required: false
+                },
+                distancePeriod: {
+                    type: 'number',
+                    multipleOf: 1.0,
+                    minimum: 1,
+                    maximum: 16,
+                    required: false
+                },
+                waves: {
+                    required: true,
+                    type: 'array',
+                    minItems: 1,
+                    maxItems: 4,
+                    definitions: {
+                        channel: {
+                            type: 'object',
+                            properties: {
+                                a: {
+                                    type: 'number',
+                                    multipleOf: 1.0,
+                                    minimum: 0,
+                                    maximum: 255
+                                },
+                                w_x: {
+                                    type: 'number',
+                                    multipleOf: 1.0,
+                                    minimum: 0,
+                                    maximum: 255
+                                },
+                                w_t: {
+                                    type: 'number',
+                                    multipleOf: 1.0,
+                                    minimum: 0,
+                                    maximum: 255
+                                },
+                                phi: {
+                                    type: 'number',
+                                    multipleOf: 1.0,
+                                    minimum: 0,
+                                    maximum: 255
+                                },
+                                b: {
+                                    type: 'number',
+                                    multipleOf: 1.0,
+                                    minimum: 0,
+                                    maximum: 255
+                                }
+                            }
+                        }
+                    },
+                    items: {
+                        type: 'object',
+                        properties: {
+                            h: { $ref: 'channel' },
+                            s: { $ref: 'channel' },
+                            v: { $ref: 'channel' },
+                            a: { $ref: 'channel' },
+                        }
+                    }
+                }
+            },
+            required: true
+        }
+    }
+};
 //# sourceMappingURL=ICustomSubmission.js.map

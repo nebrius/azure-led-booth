@@ -32,7 +32,6 @@ export enum QueueType {
 
 export interface IQueueEntry {
   type: QueueType;
-  displayName: string;
 }
 
 export interface IBasicQueueEntry extends IQueueEntry {
@@ -41,7 +40,7 @@ export interface IBasicQueueEntry extends IQueueEntry {
 }
 
 export interface ICustomQueueEntry extends IQueueEntry {
-  type: QueueType.Basic;
+  type: QueueType.Custom;
   userId: string;
   submission: ICustomSubmission;
 }

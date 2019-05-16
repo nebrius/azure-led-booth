@@ -41,10 +41,12 @@ const submitCustomTrigger = (context, req) => {
             util_1.sendErrorResponse(500, 'Could not get queue', context);
             return;
         }
-        queueService.createMessage(AZURE_STORAGE_QUEUE_NAME, JSON.stringify({
-            type: 'custom',
-            message
-        }), (addErr, addResult, addResponse) => {
+        const entry = {
+            type: common_1.QueueType.Custom,
+            userId: '',
+            submission: message
+        };
+        queueService.createMessage(AZURE_STORAGE_QUEUE_NAME, JSON.stringify(entry), (addErr, addResult, addResponse) => {
             if (addErr) {
                 util_1.sendErrorResponse(500, 'Could not add message to queue', context);
                 return;

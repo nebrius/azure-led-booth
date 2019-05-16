@@ -41,10 +41,11 @@ const submitBasicTrigger = (context, req) => {
             util_1.sendErrorResponse(500, 'Could not get queue', context);
             return;
         }
-        queueService.createMessage(AZURE_STORAGE_QUEUE_NAME, JSON.stringify({
-            type: 'basic',
-            message
-        }), (addErr, addResult, addResponse) => {
+        const entry = {
+            type: common_1.QueueType.Basic,
+            submission: message
+        };
+        queueService.createMessage(AZURE_STORAGE_QUEUE_NAME, JSON.stringify(entry), (addErr) => {
             if (addErr) {
                 util_1.sendErrorResponse(500, 'Could not add message to queue', context);
                 return;

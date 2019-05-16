@@ -25,7 +25,13 @@ SOFTWARE.
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
 import { createQueueService } from 'azure-storage';
 import { validate } from 'revalidator';
-import { getEnvironmentVariable, customSubmissionSchema } from './common/common';
+import {
+  getEnvironmentVariable,
+  customSubmissionSchema,
+  ICustomSubmission,
+  ICustomQueueEntry,
+  QueueType
+} from './common/common';
 import { sendErrorResponse } from './util/util';
 
 const AZURE_STORAGE_QUEUE_NAME = getEnvironmentVariable('AZURE_STORAGE_QUEUE_NAME');
@@ -33,7 +39,7 @@ const AZURE_STORAGE_CONNECTION_STRING = getEnvironmentVariable('AZURE_STORAGE_CO
 
 const submitCustomTrigger: AzureFunction = (context: Context, req: HttpRequest): void => {
 
-  const message = req.body;
+  const message: ICustomSubmission = req.body;
   if (!validate(message, customSubmissionSchema).valid) {
     sendErrorResponse(400, 'Invalid submission', context);
     return;
@@ -45,10 +51,12 @@ const submitCustomTrigger: AzureFunction = (context: Context, req: HttpRequest):
       sendErrorResponse(500, 'Could not get queue', context);
       return;
     }
-    queueService.createMessage(AZURE_STORAGE_QUEUE_NAME, JSON.stringify({
-      type: 'custom',
-      message
-    }), (addErr, addResult, addResponse) => {
+    const entry: ICustomQueueEntry = {
+      type: QueueType.Custom,
+      userId: '', // TODO
+      submission: message
+    };
+    queueService.createMessage(AZURE_STORAGE_QUEUE_NAME, JSON.stringify(entry), (addErr, addResult, addResponse) => {
       if (addErr) {
         sendErrorResponse(500, 'Could not add message to queue', context);
         return;
