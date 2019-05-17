@@ -5,11 +5,15 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prebuild": "tslint -p tsconfig.json",
-    "build": "webpack"
+    "build": "webpack",
+    "postbuild": "cpy static/**/* dist/",
+    "deploy": "az storage blob upload-batch -s ./dist -d \\$web/custom --account-name brhughledstorage"
   },
   "devDependencies": {
     "@types/react": "^16.8.14",
     "@types/react-dom": "^16.8.4",
+    "cpy-cli": "^2.0.0",
+    "rvl-node-types": "^1.0.0",
     "ts-loader": "^5.3.3",
     "tslint": "^5.16.0",
     "typescript": "^3.4.4",
