@@ -1,4 +1,4 @@
-<!--
+/*
 MIT License
 
 Copyright (c) Bryan Hughes <bryan@nebri.us>
@@ -20,15 +20,15 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
--->
-<!DOCTYPE html>
-<html>
-<head>
-  <title>JSConf EU Azure LED: Basic Submissions</title>
-  <link rel='stylesheet' type='text/css' href='style.css' />
-</head>
-<body>
-  <di id="app"></di>
-  <script src="bundle.js"></script>
-</body>
-</html>
+*/
+
+import * as React from 'react';
+import { render } from 'react-dom';
+import { AppComponent } from './components/custom-app';
+
+render(
+  (
+    <AppComponent />
+  ),
+  document.getElementById('app')
+);

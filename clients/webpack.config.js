@@ -1,12 +1,15 @@
 const { join } = require('path');
 
 module.exports = {
-  entry: './src/index.tsx',
+  entry: {
+    basic: './src/basic.tsx',
+    custom: './src/custom.tsx',
+  },
 
   mode: 'development',
 
   output: {
-    filename: 'bundle.js',
+    filename: '[name].js',
     path: join(__dirname, 'dist')
   },
 
