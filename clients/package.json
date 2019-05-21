@@ -7,7 +7,7 @@
     "prebuild": "tslint -p tsconfig.json",
     "build": "webpack",
     "postbuild": "cpy static/**/* dist/",
-    "deploy": "az storage blob upload-batch -s ./dist -d \\$web/basic --account-name brhughledstorage",
+    "deploy": "az storage blob upload-batch -s ./dist -d \\$web --account-name brhughledstorage",
     "start": "http-server ./dist"
   },
   "devDependencies": {
