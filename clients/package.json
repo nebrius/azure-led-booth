@@ -4,9 +4,17 @@
   "description": "Web client for submitting basic animations",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prebuild": "tslint -p tsconfig.json",
-    "build": "webpack",
-    "postbuild": "cpy static/**/* dist/",
+    "lint": "tslint -p tsconfig.json",
+    "build-static": "cpy static/**/* dist/",
+
+    "prebuild-prod": "npm run lint",
+    "build-prod": "webpack --mode=production",
+    "postbuild-prod": "npm run build-static",
+
+    "prebuild-dev": "npm run lint",
+    "build-dev": "webpack --mode=development",
+    "postbuild-dev": "npm run build-static",
+
     "deploy": "az storage blob upload-batch -s ./dist -d \\$web --account-name brhughledstorage",
     "start": "http-server ./dist"
   },

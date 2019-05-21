@@ -1,20 +1,17 @@
 const { join } = require('path');
 
-module.exports = {
+module.exports = (env, argv) => ({
   entry: {
     basic: './src/basic.tsx',
     custom: './src/custom.tsx',
   },
 
-  mode: 'development',
+  mode: argv.mode,
 
   output: {
     filename: '[name].js',
     path: join(__dirname, 'dist')
   },
-
-  // Enable sourcemaps for debugging webpack's output.
-  devtool: 'inline-source-map',
 
   resolve: {
     // Add '.ts' and '.tsx' as resolvable extensions.
@@ -29,4 +26,4 @@ module.exports = {
     ]
   }
 
-};
+});
