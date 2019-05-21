@@ -23,9 +23,15 @@ SOFTWARE.
 */
 
 import * as React from 'react';
+import { SubmissionComponent } from './submission';
+import { QueueComponent } from './queue';
 
 export function AppComponent(): JSX.Element {
   return (
-    <div>Hi from React</div>
+    <div className="app">
+      <header className="header"><h1>Azure LED Basic Animation Submission</h1></header>
+      <SubmissionComponent />
+      <QueueComponent />
+    </div>
   );
 }

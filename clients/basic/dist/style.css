@@ -22,10 +22,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import * as React from 'react';
+.app {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
 
-export function QueueComponent(): JSX.Element {
-  return (
-    <div className="queue">Queue</div>
-  );
+  display: grid;
+  grid-template-columns: 65% 35%;
+  grid-template-rows: 100px auto;
+  grid-template-areas:
+    "header header"
+    "submission queue";
+}
+
+.header {
+  background-color: black;
+  color: white;
+  grid-area: header;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.submission {
+  padding: 10px;
+  grid-area: submission;
+}
+
+.queue {
+  padding: 10px;
+  border-left: solid 1px #ccc;
+  grid-area: queue;
 }

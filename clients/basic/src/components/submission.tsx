@@ -24,8 +24,8 @@ SOFTWARE.
 
 import * as React from 'react';
 
-export function QueueComponent(): JSX.Element {
+export function SubmissionComponent(): JSX.Element {
   return (
-    <div className="queue">Queue</div>
+    <div className="submission">Submission</div>
   );
 }
