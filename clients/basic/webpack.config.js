@@ -1,7 +1,7 @@
 const { join } = require('path');
 
 module.exports = {
-  entry: './src/app.tsx',
+  entry: './src/index.tsx',
 
   mode: 'development',
 
