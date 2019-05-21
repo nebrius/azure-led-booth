@@ -8,6 +8,8 @@ module.exports = (env, argv) => ({
 
   mode: argv.mode,
 
+  devtool: argv.mode === 'development' ? 'inline-source-map' : undefined,
+
   output: {
     filename: '[name].js',
     path: join(__dirname, 'dist')
