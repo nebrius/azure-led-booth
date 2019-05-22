@@ -24,17 +24,21 @@ SOFTWARE.
 
 import * as React from 'react';
 import { render } from 'react-dom';
-import { AppComponent } from './components/simulator-app';
+import { AppComponent, IColor } from './components/simulator-app';
+import { IWaveParameters } from 'rvl-node-types';
+import { createWaveParameters, createSolidColorWave } from 'rvl-node-animations';
 
 const startTime = Date.now();
+let waveParameters: IWaveParameters = createWaveParameters(createSolidColorWave(0, 0, 0, 255));
 
-function renderApp(hue: number) {
-  if (hue) {
-    hue++;
-  }
+function onWaveParametersUpdated(newWaveParameters: IWaveParameters) {
+  waveParameters = newWaveParameters;
+}
+
+function renderApp(colors: IColor[]) {
   render(
     (
-      <AppComponent />
+      <AppComponent colors={colors} waveParameters={waveParameters} onWaveParametersUpdated={onWaveParametersUpdated} />
     ),
     document.getElementById('app')
   );
@@ -42,6 +46,33 @@ function renderApp(hue: number) {
 
 setInterval(() => {
   const animationTime = Date.now() - startTime;
-  const hue = animationTime % 360;
-  renderApp(hue);
+  const colors: IColor[] = [
+    { hue: 0, saturation: 100, value: 100 },
+    { hue: 12, saturation: 100, value: 100 },
+    { hue: 24, saturation: 100, value: 100 },
+    { hue: 36, saturation: 100, value: 100 },
+    { hue: 48, saturation: 100, value: 100 },
+    { hue: 60, saturation: 100, value: 100 },
+    { hue: 72, saturation: 100, value: 100 },
+    { hue: 84, saturation: 100, value: 100 },
+    { hue: 96, saturation: 100, value: 100 },
+    { hue: 108, saturation: 100, value: 100 },
+    { hue: 120, saturation: 100, value: 100 },
+    { hue: 132, saturation: 100, value: 100 },
+    { hue: 144, saturation: 100, value: 100 },
+    { hue: 156, saturation: 100, value: 100 },
+    { hue: 168, saturation: 100, value: 100 },
+    { hue: 180, saturation: 100, value: 100 },
+    { hue: 192, saturation: 100, value: 100 },
+    { hue: 204, saturation: 100, value: 100 },
+    { hue: 216, saturation: 100, value: 100 },
+    { hue: 228, saturation: 100, value: 100 },
+    { hue: 240, saturation: 100, value: 100 },
+    { hue: 252, saturation: 100, value: 100 },
+    { hue: 264, saturation: 100, value: 100 },
+    { hue: 276, saturation: 100, value: 100 }
+  ];
+  console.log(animationTime);
+
+  renderApp(colors);
 }, 33);

@@ -16,6 +16,7 @@
     "start": "http-server ./dist"
   },
   "devDependencies": {
+    "@types/color-convert": "^1.9.0",
     "@types/react": "^16.8.14",
     "@types/react-dom": "^16.8.4",
     "cpy-cli": "^2.0.0",
@@ -28,8 +29,10 @@
     "webpack-cli": "^3.3.0"
   },
   "dependencies": {
+    "color-convert": "^2.0.0",
     "react": "^16.8.6",
-    "react-dom": "^16.8.6"
+    "react-dom": "^16.8.6",
+    "rvl-node-animations": "^1.0.1"
   },
   "author": "Bryan Hughes <bryan@nebri.us>",
   "license": "MIT"

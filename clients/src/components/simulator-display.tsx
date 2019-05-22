@@ -23,26 +23,25 @@ SOFTWARE.
 */
 
 import * as React from 'react';
-import { IWaveParameters } from 'rvl-node-types';
-import { LEDContainerComponent } from './simulator-display-led';
+import { LEDContainerComponent, IColor } from './simulator-display-led';
 
-interface IDisplayComponenttState {
-  waveParameters: IWaveParameters;
+export { IColor } from './simulator-display-led';
+
+interface IDisplayComponentProps {
+  colors: IColor[];
 }
 
-export class DisplayComponent extends React.Component<IDisplayComponenttState, {}> {
-  public render() {
-    return (
-      <div className="display">
-        <div className="display-led-set">
-          <LEDContainerComponent numLEDS={16} key={1} />
-          <LEDContainerComponent numLEDS={8} key={2} />
-          <LEDContainerComponent numLEDS={12} key={3} />
-          <LEDContainerComponent numLEDS={18} key={4} />
-          <LEDContainerComponent numLEDS={10} key={5} />
-        </div>
-        <div className="display-led-base" />
+export function DisplayComponent(props: IDisplayComponentProps): JSX.Element {
+  return (
+    <div className="display">
+      <div className="display-led-set">
+        <LEDContainerComponent numLEDS={16} key={1} colors={props.colors} />
+        <LEDContainerComponent numLEDS={8} key={2} colors={props.colors} />
+        <LEDContainerComponent numLEDS={12} key={3} colors={props.colors} />
+        <LEDContainerComponent numLEDS={18} key={4} colors={props.colors} />
+        <LEDContainerComponent numLEDS={10} key={5} colors={props.colors} />
       </div>
-    );
-  }
+      <div className="display-led-base" />
+    </div>
+  );
 }
