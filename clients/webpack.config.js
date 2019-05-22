@@ -13,6 +13,7 @@ module.exports = (env, argv) => {
     entry: {
       basic: './src/basic.tsx',
       custom: './src/custom.tsx',
+      simulator: './src/simulator.tsx'
     },
 
     mode: argv.mode,
