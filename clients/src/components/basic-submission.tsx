@@ -24,7 +24,7 @@ SOFTWARE.
 
 import * as React from 'react';
 import { IBasicSubmission } from '../common/common';
-import { api } from '../util';
+import { api, updateQueue } from '../util';
 
 export class SubmissionComponent extends React.Component<{}, IBasicSubmission> {
 
@@ -122,10 +122,11 @@ export class SubmissionComponent extends React.Component<{}, IBasicSubmission> {
     });
   }
 
-  private _handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  private _handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.log(this.state);
-    api('submit-basic', 'POST', this.state);
+    await api('submit-basic', 'POST', this.state);
+    updateQueue();
   }
 
 }

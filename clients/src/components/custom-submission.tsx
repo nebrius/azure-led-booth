@@ -23,20 +23,69 @@ SOFTWARE.
 */
 
 import * as React from 'react';
+import { ICustomSubmission } from '../common/common';
+import { api, updateQueue } from '../util';
 
-export function SubmissionComponent(): JSX.Element {
-  return (
-    <div className="submission">
-      <div className="submission-header"><h2>New Submission</h2></div>
-      <form className="submission-form">
-        <label htmlFor="displayNameInput">Azure Function Endpoint:</label>
-        <input type="text" id="displayNameInput"></input>
-        <label htmlFor="displayNameInput">Display Name:</label>
-        <input type="text" id="displayNameInput"></input>
-        <div>
-          <button type="submit">Submit</button>
-        </div>
-      </form>
-    </div>
-  );
+export class SubmissionComponent extends React.Component<{}, ICustomSubmission> {
+
+  public state = {
+    functionUrl: '',
+    displayName: ''
+  };
+
+  public render() {
+    return (
+      <div className="submission">
+        <div className="submission-header"><h2>New Submission</h2></div>
+        <form className="submission-form" onSubmit={this._handleSubmit}>
+          <label htmlFor="displayNameInput">Azure Function Endpoint:</label>
+          <input
+            type="text"
+            id="displayNameInput"
+            value={this.state.functionUrl}
+            onChange={this._handleFunctionUrlChanged} />
+
+          <label htmlFor="displayNameInput">Display Name:</label>
+          <input
+            type="text"
+            id="displayNameInput"
+            value={this.state.displayName}
+            onChange={this._handleDisplayNameChanged} />
+
+          <div>
+            <button type="submit">Submit</button>
+          </div>
+        </form>
+      </div>
+    );
+  }
+
+  private _handleFunctionUrlChanged = (event: React.FormEvent<HTMLInputElement>) => {
+    const functionUrl = event.currentTarget.value;
+    this.setState((previousState) => {
+      const newState = {
+        ...previousState,
+        functionUrl
+      };
+      return newState;
+    });
+  }
+
+  private _handleDisplayNameChanged = (event: React.FormEvent<HTMLInputElement>) => {
+    const displayName = event.currentTarget.value;
+    this.setState((previousState) => {
+      const newState = {
+        ...previousState,
+        displayName
+      };
+      return newState;
+    });
+  }
+
+  private _handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    console.log(this.state);
+    await api('submit-custom', 'POST', this.state);
+    updateQueue();
+  }
 }

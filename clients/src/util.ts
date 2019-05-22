@@ -24,7 +24,7 @@ SOFTWARE.
 
 import { IBasicQueueEntry, ICustomQueueEntry } from './common/common';
 
-const QUEUE_UPDATE_RATE = 10 * 1000;
+const QUEUE_UPDATE_RATE = 15 * 1000;
 
 // This variable is injected by WebPack, but TypeScript doesn't know that, so we declare the variable here
 declare var API_ENDPOINT: string;
