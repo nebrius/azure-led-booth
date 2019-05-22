@@ -1,4 +1,3 @@
-"use strict";
 /*
 MIT License
 
@@ -22,13 +21,33 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-Object.defineProperty(exports, "__esModule", { value: true });
-__export(require("./src/util"));
-__export(require("./src/IBasicSubmission"));
-__export(require("./src/ICustomSubmission"));
-__export(require("./src/ISimulationSubmission"));
-__export(require("./src/IQueue"));
-//# sourceMappingURL=common.js.map
+
+import { AzureFunction, Context, HttpRequest } from '@azure/functions';
+import { sendErrorResponse } from './util/util';
+import { validate } from 'revalidator';
+import {
+  ISimulationSubmission,
+  simulationSubmissionSchema,
+  ICustomSubmissionResponse,
+  customSubmissionResponseSchema
+} from './common/common';
+import fetch from 'node-fetch';
+
+const submitSimulationTrigger: AzureFunction = async (context: Context, req: HttpRequest) => {
+  const message: ISimulationSubmission = req.body;
+  if (!validate(message, simulationSubmissionSchema).valid) {
+    sendErrorResponse(400, 'Invalid submission', context);
+    return;
+  }
+  const response = await fetch(message.functionUrl);
+  const responseMessage: ICustomSubmissionResponse = await response.json();
+  if (!validate(responseMessage, customSubmissionResponseSchema).valid) {
+    throw new Error(`Received invalid response from user Function, skipping: ${JSON.stringify(message, null, '  ')}`);
+  }
+  context.res = {
+    body: JSON.stringify(responseMessage)
+  };
+  context.done();
+};
+
+export default submitSimulationTrigger;

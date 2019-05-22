@@ -22,13 +22,26 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
 Object.defineProperty(exports, "__esModule", { value: true });
-__export(require("./src/util"));
-__export(require("./src/IBasicSubmission"));
-__export(require("./src/ICustomSubmission"));
-__export(require("./src/ISimulationSubmission"));
-__export(require("./src/IQueue"));
-//# sourceMappingURL=common.js.map
+const util_1 = require("./util/util");
+const revalidator_1 = require("revalidator");
+const common_1 = require("./common/common");
+const node_fetch_1 = require("node-fetch");
+const submitSimulationTrigger = async (context, req) => {
+    const message = req.body;
+    if (!revalidator_1.validate(message, common_1.simulationSubmissionSchema).valid) {
+        util_1.sendErrorResponse(400, 'Invalid submission', context);
+        return;
+    }
+    const response = await node_fetch_1.default(message.functionUrl);
+    const responseMessage = await response.json();
+    if (!revalidator_1.validate(responseMessage, common_1.customSubmissionResponseSchema).valid) {
+        throw new Error(`Received invalid response from user Function, skipping: ${JSON.stringify(message, null, '  ')}`);
+    }
+    context.res = {
+        body: JSON.stringify(responseMessage)
+    };
+    context.done();
+};
+exports.default = submitSimulationTrigger;
+//# sourceMappingURL=index.js.map

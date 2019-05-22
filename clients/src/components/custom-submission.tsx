@@ -84,7 +84,6 @@ export class SubmissionComponent extends React.Component<{}, ICustomSubmission> 
 
   private _handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log(this.state);
     await api('submit-custom', 'POST', this.state);
     updateQueue();
   }

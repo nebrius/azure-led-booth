@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig-functions-base.json",
+  "include": [
+    "submit-simulation/src/**/*.ts"
+  ],
+  "compilerOptions": {
+    "outDir": "submit-simulation/dist",
+    "rootDir": "submit-simulation/src",
+  }
+}

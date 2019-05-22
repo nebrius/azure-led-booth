@@ -1,4 +1,3 @@
-"use strict";
 /*
 MIT License
 
@@ -22,13 +21,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+
+// This is what's sent from the Azure Function creator's browser to the server to add to the queue
+export interface ISimulationSubmission {
+  functionUrl: string;
 }
-Object.defineProperty(exports, "__esModule", { value: true });
-__export(require("./src/util"));
-__export(require("./src/IBasicSubmission"));
-__export(require("./src/ICustomSubmission"));
-__export(require("./src/ISimulationSubmission"));
-__export(require("./src/IQueue"));
-//# sourceMappingURL=common.js.map
+
+// Force to "any" type, otherwise TypeScript thinks the type is too strict and won't ever compile
+export const simulationSubmissionSchema: any = {
+  properties: {
+    functionUrl: {
+      type: 'string',
+      pattern: '^https\:\/\/[a-zA-Z0-9\-]*?\.azurewebsites\.net\/.*$',
+      required: true
+    }
+  }
+};

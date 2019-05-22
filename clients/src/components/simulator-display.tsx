@@ -27,7 +27,9 @@ import * as React from 'react';
 export class DisplayComponent extends React.Component<{}, {}> {
   public render() {
     return (
-      <div>Display</div>
+      <div className="display">
+        Display
+      </div>
     );
   }
 }

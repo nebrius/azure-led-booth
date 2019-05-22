@@ -23,11 +23,51 @@ SOFTWARE.
 */
 
 import * as React from 'react';
+import { api } from '../util';
 
-export class ControlsComponent extends React.Component<{}, {}> {
+interface IControlsComponentState {
+  functionUrl: string;
+}
+
+export class ControlsComponent extends React.Component<{}, IControlsComponentState> {
+
+  public state = {
+    functionUrl: ''
+  };
+
   public render() {
     return (
-      <div>Controls</div>
+      <div className="controls">
+        <form className="controls-form" onSubmit={this._handleSubmit}>
+          <label htmlFor="displayNameInput">Azure Function Endpoint:</label>
+          <input
+            type="text"
+            id="displayNameInput"
+            value={this.state.functionUrl}
+            onChange={this._handleFunctionUrlChanged} />
+
+          <div>
+            <button type="submit">Run</button>
+          </div>
+        </form>
+      </div>
     );
+  }
+
+  private _handleFunctionUrlChanged = (event: React.FormEvent<HTMLInputElement>) => {
+    const functionUrl = event.currentTarget.value;
+    this.setState((previousState) => {
+      const newState = {
+        ...previousState,
+        functionUrl
+      };
+      return newState;
+    });
+  }
+
+  private _handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    await api('submit-simulation', 'POST', this.state);
+    // TODO: start simulation
   }
 }

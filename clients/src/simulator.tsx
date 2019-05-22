@@ -25,7 +25,6 @@ SOFTWARE.
 import * as React from 'react';
 import { render } from 'react-dom';
 import { AppComponent } from './components/simulator-app';
-import { updateQueue, onQueueUpdated } from './util';
 
 function renderApp() {
   console.log('Re-rendering app');
@@ -38,6 +37,3 @@ function renderApp() {
 }
 
 renderApp();
-onQueueUpdated(renderApp);
-
-updateQueue();

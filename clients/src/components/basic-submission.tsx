@@ -124,7 +124,6 @@ export class SubmissionComponent extends React.Component<{}, IBasicSubmission> {
 
   private _handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log(this.state);
     await api('submit-basic', 'POST', this.state);
     updateQueue();
   }
