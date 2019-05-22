@@ -23,25 +23,19 @@ SOFTWARE.
 */
 
 import * as React from 'react';
-import { render } from 'react-dom';
-import { AppComponent } from './components/simulator-app';
 
-const startTime = Date.now();
-
-function renderApp(hue: number) {
-  if (hue) {
-    hue++;
-  }
-  render(
-    (
-      <AppComponent />
-    ),
-    document.getElementById('app')
-  );
+export interface ILEDContainerComponentProps {
+  numLEDS: number;
 }
 
-setInterval(() => {
-  const animationTime = Date.now() - startTime;
-  const hue = animationTime % 360;
-  renderApp(hue);
-}, 33);
+export function LEDContainerComponent(props: ILEDContainerComponentProps): JSX.Element {
+  const leds: JSX.Element[] = [];
+  for (let i = 0; i < props.numLEDS; i++) {
+    leds.unshift(<div className="display-led" key={i} />);
+  }
+  return (
+    <div className="display-led-container">
+      <div className="display-led-overlay">{leds}</div>
+    </div>
+  );
+}

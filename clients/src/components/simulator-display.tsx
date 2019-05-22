@@ -24,6 +24,7 @@ SOFTWARE.
 
 import * as React from 'react';
 import { IWaveParameters } from 'rvl-node-types';
+import { LEDContainerComponent } from './simulator-display-led';
 
 interface IDisplayComponenttState {
   waveParameters: IWaveParameters;
@@ -33,9 +34,14 @@ export class DisplayComponent extends React.Component<IDisplayComponenttState, {
   public render() {
     return (
       <div className="display">
-        <div>
-          Simulation
+        <div className="display-led-set">
+          <LEDContainerComponent numLEDS={16} key={1} />
+          <LEDContainerComponent numLEDS={8} key={2} />
+          <LEDContainerComponent numLEDS={12} key={3} />
+          <LEDContainerComponent numLEDS={18} key={4} />
+          <LEDContainerComponent numLEDS={10} key={5} />
         </div>
+        <div className="display-led-base" />
       </div>
     );
   }
