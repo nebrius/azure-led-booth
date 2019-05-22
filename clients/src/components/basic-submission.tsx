@@ -26,6 +26,21 @@ import * as React from 'react';
 
 export function SubmissionComponent(): JSX.Element {
   return (
-    <div className="submission">Submission</div>
+    <div className="submission">
+      <div className="submission-header"><h2>New Submission</h2></div>
+      <form className="submission-form">
+        <label htmlFor="foregroundColorInput">Foreground Color:</label>
+        <input type="color" id="foregroundColorInput"></input>
+        <label htmlFor="backgroundColorInput">Background Color:</label>
+        <input type="color" id="foregroundColorInput"></input>
+        <label htmlFor="rateInput">Rate:</label>
+        <input type="range" min={1} max={32} defaultValue="8" id="rateInput"></input>
+        <label htmlFor="displayNameInput">Display Name:</label>
+        <input type="text" id="displayNameInput"></input>
+        <div>
+          <button type="submit">Submit</button>
+        </div>
+      </form>
+    </div>
   );
 }

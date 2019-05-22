@@ -26,6 +26,17 @@ import * as React from 'react';
 
 export function SubmissionComponent(): JSX.Element {
   return (
-    <div className="submission">Submission</div>
+    <div className="submission">
+      <div className="submission-header"><h2>New Submission</h2></div>
+      <form className="submission-form">
+        <label htmlFor="displayNameInput">Azure Function Endpoint:</label>
+        <input type="text" id="displayNameInput"></input>
+        <label htmlFor="displayNameInput">Display Name:</label>
+        <input type="text" id="displayNameInput"></input>
+        <div>
+          <button type="submit">Submit</button>
+        </div>
+      </form>
+    </div>
   );
 }

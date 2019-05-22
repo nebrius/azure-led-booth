@@ -53,6 +53,10 @@ SOFTWARE.
   grid-area: submission;
 }
 
+.submission-header {
+  text-align: center;
+}
+
 .queue {
   padding: 10px;
   border-left: solid 1px #ccc;
@@ -65,4 +69,25 @@ SOFTWARE.
 
 .queue-entry {
   padding: 10px;
+}
+
+.submission-form {
+  display: grid;
+  grid-template-columns: max-content auto;
+  grid-template-rows: auto auto auto auto auto;
+  grid-gap: 20px 20px;
+}
+
+.submission-form > label {
+  grid-column: 1 / span 1;
+}
+
+.submission-form > input {
+  grid-column: 2 / span 1;
+}
+
+.submission-form > div {
+  grid-column: 1 / span 2;
+  display: flex;
+  justify-content: center;
 }

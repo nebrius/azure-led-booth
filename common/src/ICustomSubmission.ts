@@ -27,7 +27,6 @@ import { IWaveParameters } from 'rvl-node-types';
 // This is what's sent from the Azure Function creator's browser to the server to add to the queue
 export interface ICustomSubmission {
   displayName: string;
-  authToken: string;
   functionUrl: string;
 }
 
