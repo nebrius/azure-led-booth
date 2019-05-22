@@ -45,6 +45,5 @@ module.exports = (env, argv) => {
       ]
     }
   };
-  console.log(JSON.stringify(config, null, '  '));
   return config;
 };

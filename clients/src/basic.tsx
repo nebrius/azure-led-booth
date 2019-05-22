@@ -25,13 +25,19 @@ SOFTWARE.
 import * as React from 'react';
 import { render } from 'react-dom';
 import { AppComponent } from './components/basic-app';
-import { api } from './util';
+import { updateQueue, onQueueUpdated } from './util';
 
-api('get-queue', 'get');
+function renderApp() {
+  console.log('Re-rendering app');
+  render(
+    (
+      <AppComponent />
+    ),
+    document.getElementById('app')
+  );
+}
 
-render(
-  (
-    <AppComponent />
-  ),
-  document.getElementById('app')
-);
+renderApp();
+onQueueUpdated(renderApp);
+
+updateQueue();

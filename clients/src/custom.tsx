@@ -25,10 +25,19 @@ SOFTWARE.
 import * as React from 'react';
 import { render } from 'react-dom';
 import { AppComponent } from './components/custom-app';
+import { updateQueue, onQueueUpdated } from './util';
 
-render(
-  (
-    <AppComponent />
-  ),
-  document.getElementById('app')
-);
+function renderApp() {
+  console.log('Re-rendering app');
+  render(
+    (
+      <AppComponent />
+    ),
+    document.getElementById('app')
+  );
+}
+
+renderApp();
+onQueueUpdated(renderApp);
+
+updateQueue();

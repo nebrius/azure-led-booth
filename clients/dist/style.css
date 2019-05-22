@@ -35,6 +35,8 @@ SOFTWARE.
   grid-template-areas:
     "header header"
     "submission queue";
+
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 }
 
 .header {
@@ -55,4 +57,12 @@ SOFTWARE.
   padding: 10px;
   border-left: solid 1px #ccc;
   grid-area: queue;
+}
+
+.queue-header {
+  text-align: center;
+}
+
+.queue-entry {
+  padding: 10px;
 }

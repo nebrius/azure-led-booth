@@ -22,11 +22,35 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+import { IBasicQueueEntry, ICustomQueueEntry } from './common/common';
+
+const QUEUE_UPDATE_RATE = 10 * 1000;
+
 // This variable is injected by WebPack, but TypeScript doesn't know that, so we declare the variable here
 declare var API_ENDPOINT: string;
 
 export async function api(endpoint: string, method: 'get' | 'post', parameters?: { [ key: string ]: string }) {
   const response = await fetch(API_ENDPOINT + endpoint);
-  const json = await response.json();
-  console.log(json);
+  return await response.json();
+}
+
+let queue: Array<IBasicQueueEntry | ICustomQueueEntry> = [];
+let updateTimeout: number = 0;
+let queueUpdatedListener: () => void | undefined;
+
+export function onQueueUpdated(cb: () => void): void {
+  queueUpdatedListener = cb;
+}
+
+export async function updateQueue() {
+  clearTimeout(updateTimeout);
+  queue = await api('get-queue', 'get');
+  if (queueUpdatedListener) {
+    queueUpdatedListener();
+  }
+  updateTimeout = window.setTimeout(updateQueue, QUEUE_UPDATE_RATE);
+}
+
+export function getCurrentQueue() {
+  return queue;
 }
