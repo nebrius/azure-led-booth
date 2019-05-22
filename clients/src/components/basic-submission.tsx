@@ -23,24 +23,109 @@ SOFTWARE.
 */
 
 import * as React from 'react';
+import { IBasicSubmission } from '../common/common';
+import { api } from '../util';
 
-export function SubmissionComponent(): JSX.Element {
-  return (
-    <div className="submission">
-      <div className="submission-header"><h2>New Submission</h2></div>
-      <form className="submission-form">
-        <label htmlFor="foregroundColorInput">Foreground Color:</label>
-        <input type="color" id="foregroundColorInput"></input>
-        <label htmlFor="backgroundColorInput">Background Color:</label>
-        <input type="color" id="foregroundColorInput"></input>
-        <label htmlFor="rateInput">Rate:</label>
-        <input type="range" min={1} max={32} defaultValue="8" id="rateInput"></input>
-        <label htmlFor="displayNameInput">Display Name:</label>
-        <input type="text" id="displayNameInput"></input>
-        <div>
-          <button type="submit">Submit</button>
-        </div>
-      </form>
-    </div>
-  );
+export class SubmissionComponent extends React.Component<{}, IBasicSubmission> {
+
+  public state = {
+    foregroundColor: '#00ff00',
+    backgroundColor: '#0000ff',
+    rate: 8,
+    displayName: ''
+  };
+
+  public render() {
+    return (
+      <div className="submission">
+        <div className="submission-header"><h2>New Submission</h2></div>
+        <form className="submission-form" onSubmit={this._handleSubmit}>
+          <label htmlFor="foregroundColorInput">Foreground Color:</label>
+          <input
+            type="color"
+            id="foregroundColorInput"
+            value={this.state.foregroundColor}
+            onChange={this._handleForegroundColorChanged} />
+
+          <label htmlFor="backgroundColorInput">Background Color:</label>
+          <input
+            type="color"
+            id="foregroundColorInput"
+            value={this.state.backgroundColor}
+            onChange={this._handleBackgroundColorChanged} />
+
+          <label htmlFor="rateInput">Rate:</label>
+          <input
+            type="range"
+            id="rateInput"
+            min={1}
+            max={32}
+            value={this.state.rate}
+            onChange={this._handleRateChanged} />
+
+          <label htmlFor="displayNameInput">Display Name:</label>
+          <input
+            type="text"
+            id="displayNameInput"
+            value={this.state.displayName}
+            onChange={this._handleDisplayNameChanged} />
+
+          <div>
+            <button type="submit">Submit</button>
+          </div>
+        </form>
+      </div>
+    );
+  }
+
+  private _handleForegroundColorChanged = (event: React.FormEvent<HTMLInputElement>) => {
+    const foregroundColor = event.currentTarget.value;
+    this.setState((previousState) => {
+      const newState = {
+        ...previousState,
+        foregroundColor
+      };
+      return newState;
+    });
+  }
+
+  private _handleBackgroundColorChanged = (event: React.FormEvent<HTMLInputElement>) => {
+    const backgroundColor = event.currentTarget.value;
+    this.setState((previousState) => {
+      const newState = {
+        ...previousState,
+        backgroundColor
+      };
+      return newState;
+    });
+  }
+
+  private _handleRateChanged = (event: React.FormEvent<HTMLInputElement>) => {
+    const rate = parseInt(event.currentTarget.value, 10);
+    this.setState((previousState) => {
+      const newState = {
+        ...previousState,
+        rate
+      };
+      return newState;
+    });
+  }
+
+  private _handleDisplayNameChanged = (event: React.FormEvent<HTMLInputElement>) => {
+    const displayName = event.currentTarget.value;
+    this.setState((previousState) => {
+      const newState = {
+        ...previousState,
+        displayName
+      };
+      return newState;
+    });
+  }
+
+  private _handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    console.log(this.state);
+    api('submit-basic', 'POST', this.state);
+  }
+
 }

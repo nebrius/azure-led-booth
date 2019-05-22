@@ -61,7 +61,7 @@ const submitBasicTrigger: AzureFunction = (context: Context, req: HttpRequest): 
         return;
       }
       context.res = {
-        body: 'OK'
+        body: JSON.stringify({ status: 'ok' })
       };
       context.done();
     });

@@ -51,7 +51,7 @@ const submitBasicTrigger = (context, req) => {
                 return;
             }
             context.res = {
-                body: 'OK'
+                body: JSON.stringify({ status: 'ok' })
             };
             context.done();
         });

@@ -133,14 +133,16 @@ const prcoessQueueTrigger: AzureFunction = (context: Context, timer: ITimerReque
   context.log('Fetching or creating queue');
   queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, (createErr, createResult, createResponse) => {
     if (createErr) {
-      context.done(new Error(`Could not get queue, bailing: ${createErr}`));
+      context.log(`Could not get queue, bailing: ${createErr}`);
+      context.done();
       return;
     }
 
     // Ignore past due timers, because we don't want a rapid succession of animations
     // Better to take too long than too short here.
     if (timer.IsPastDue) {
-      context.done(new Error('Timer is past due, skipping this round until the timer infrastructure catches up'));
+      context.log('Timer is past due, skipping this round until the timer infrastructure catches up');
+      context.done();
       return;
     }
 
@@ -151,7 +153,8 @@ const prcoessQueueTrigger: AzureFunction = (context: Context, timer: ITimerReque
       queueService.getMessage(AZURE_STORAGE_QUEUE_NAME, (getErr, message) => {
         // This means there was an error getting the messages, and we should report it as an error
         if (getErr) {
-          context.done(new Error(`Could not get message, bailing: ${getErr}`));
+          context.log(`Could not get message, bailing: ${getErr}`);
+          context.done();
           return;
         }
 
@@ -187,7 +190,8 @@ const prcoessQueueTrigger: AzureFunction = (context: Context, timer: ITimerReque
           // Now that we're done processing, let's remove it from the queue
           queueService.deleteMessage(AZURE_STORAGE_QUEUE_NAME, messageId as string, popReceipt as string, (err) => {
             if (err) {
-              context.done(new Error(`Could not delete message, bailing: ${err}`));
+              context.log(`Could not delete message, bailing: ${err}`);
+              context.done();
               return;
             }
             cb();
