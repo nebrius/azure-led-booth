@@ -25,13 +25,40 @@ SOFTWARE.
 import * as React from 'react';
 import { ControlsComponent } from './simulator-controls';
 import { DisplayComponent } from './simulator-display';
+import { IWaveParameters } from 'rvl-node-types';
 
-export function AppComponent(): JSX.Element {
-  return (
-    <div className="app">
-      <header className="header"><h1>Azure LED Simulator</h1></header>
-      <ControlsComponent />
-      <DisplayComponent />
-    </div>
-  );
+interface IAppComponentState {
+  waveParameters: IWaveParameters;
+}
+
+export class AppComponent extends React.Component<{}, IAppComponentState> {
+
+  public state = {
+    waveParameters: {
+      waves: []
+    }
+  };
+
+  public render() {
+    return (
+      <div className="app">
+        <header className="header"><h1>Azure LED Simulator</h1></header>
+        <ControlsComponent
+          waveParameters={this.state.waveParameters}
+          onWaveParametersUpdated={this._onWaveParamtersUpdated} />
+        <DisplayComponent
+          waveParameters={this.state.waveParameters} />
+      </div>
+    );
+  }
+
+  private _onWaveParamtersUpdated = (waveParameters: IWaveParameters) => {
+    this.setState((previousState) => {
+      const newState = {
+        ...previousState,
+        waveParameters
+      };
+      return newState;
+    });
+  }
 }

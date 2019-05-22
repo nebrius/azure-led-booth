@@ -16,7 +16,6 @@
     "start": "http-server ./dist"
   },
   "devDependencies": {
-    "@types/color-convert": "^1.9.0",
     "@types/react": "^16.8.14",
     "@types/react-dom": "^16.8.4",
     "cpy-cli": "^2.0.0",
@@ -29,7 +28,6 @@
     "webpack-cli": "^3.3.0"
   },
   "dependencies": {
-    "@material-ui/core": "^3.9.3",
     "react": "^16.8.6",
     "react-dom": "^16.8.6"
   },

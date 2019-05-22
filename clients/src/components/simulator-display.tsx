@@ -23,12 +23,19 @@ SOFTWARE.
 */
 
 import * as React from 'react';
+import { IWaveParameters } from 'rvl-node-types';
 
-export class DisplayComponent extends React.Component<{}, {}> {
+interface IDisplayComponenttState {
+  waveParameters: IWaveParameters;
+}
+
+export class DisplayComponent extends React.Component<IDisplayComponenttState, {}> {
   public render() {
     return (
       <div className="display">
-        Display
+        <div>
+          Simulation
+        </div>
       </div>
     );
   }

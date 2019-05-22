@@ -24,12 +24,18 @@ SOFTWARE.
 
 import * as React from 'react';
 import { api } from '../util';
+import { IWaveParameters } from 'rvl-node-types';
+
+interface IControlsComponentProps {
+  onWaveParametersUpdated: (waveParamters: IWaveParameters) => void;
+  waveParameters: IWaveParameters;
+}
 
 interface IControlsComponentState {
   functionUrl: string;
 }
 
-export class ControlsComponent extends React.Component<{}, IControlsComponentState> {
+export class ControlsComponent extends React.Component<IControlsComponentProps, IControlsComponentState> {
 
   public state = {
     functionUrl: ''
@@ -38,6 +44,7 @@ export class ControlsComponent extends React.Component<{}, IControlsComponentSta
   public render() {
     return (
       <div className="controls">
+        <h3>Your Function details</h3>
         <form className="controls-form" onSubmit={this._handleSubmit}>
           <label htmlFor="displayNameInput">Azure Function Endpoint:</label>
           <input
@@ -50,6 +57,8 @@ export class ControlsComponent extends React.Component<{}, IControlsComponentSta
             <button type="submit">Run</button>
           </div>
         </form>
+        <h3>Your Wave Parameters</h3>
+        <pre className="controls-parameters">{JSON.stringify(this.props.waveParameters, null, '  ')}</pre>
       </div>
     );
   }
@@ -67,7 +76,7 @@ export class ControlsComponent extends React.Component<{}, IControlsComponentSta
 
   private _handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    await api('submit-simulation', 'POST', this.state);
-    // TODO: start simulation
+    const waveParameters = await api('submit-simulation', 'POST', this.state);
+    this.props.onWaveParametersUpdated(waveParameters);
   }
 }

@@ -96,6 +96,10 @@ SOFTWARE.
   padding: 10px;
   grid-area: queue;
   border-left: solid 1px #ccc;
+  display: grid;
+  grid-template-columns: 100%;
+  grid-template-rows: max-content max-content max-content auto;
+  overflow: hidden;
 }
 
 .controls-form {
@@ -103,6 +107,10 @@ SOFTWARE.
   grid-template-columns: 100%;
   grid-template-rows: auto auto auto;
   grid-gap: 20px 20px;
+}
+
+.controls > pre {
+  overflow-y: scroll;
 }
 
 .display {
