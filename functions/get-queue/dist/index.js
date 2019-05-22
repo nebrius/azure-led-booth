@@ -29,8 +29,6 @@ const util_1 = require("./util/util");
 const AZURE_STORAGE_QUEUE_NAME = common_1.getEnvironmentVariable('AZURE_STORAGE_QUEUE_NAME');
 const AZURE_STORAGE_CONNECTION_STRING = common_1.getEnvironmentVariable('AZURE_STORAGE_CONNECTION_STRING');
 const getQueueTrigger = (context, req) => {
-    const userId = req.query.userId;
-    context.log(userId); // TODO: integrate
     const queueService = azure_storage_1.createQueueService(AZURE_STORAGE_CONNECTION_STRING);
     queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, (createErr, createResult, createResponse) => {
         if (createErr) {

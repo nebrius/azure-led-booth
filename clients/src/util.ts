@@ -22,6 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-export async function api(endpoint: string, method: 'get' | 'post', parameters: { [ key: string ]: string }) {
-  // TODO
+// This variable is injected by WebPack, but TypeScript doesn't know that, so we declare the variable here
+declare var API_ENDPOINT: string;
+
+export async function api(endpoint: string, method: 'get' | 'post', parameters?: { [ key: string ]: string }) {
+  const response = await fetch(API_ENDPOINT + endpoint);
+  const json = await response.json();
+  console.log(json);
 }

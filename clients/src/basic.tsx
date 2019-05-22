@@ -25,6 +25,9 @@ SOFTWARE.
 import * as React from 'react';
 import { render } from 'react-dom';
 import { AppComponent } from './components/basic-app';
+import { api } from './util';
+
+api('get-queue', 'get');
 
 render(
   (

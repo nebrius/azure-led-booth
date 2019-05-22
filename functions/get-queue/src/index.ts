@@ -31,10 +31,6 @@ const AZURE_STORAGE_QUEUE_NAME = getEnvironmentVariable('AZURE_STORAGE_QUEUE_NAM
 const AZURE_STORAGE_CONNECTION_STRING = getEnvironmentVariable('AZURE_STORAGE_CONNECTION_STRING');
 
 const getQueueTrigger: AzureFunction = (context: Context, req: HttpRequest): void => {
-
-  const userId = req.query.userId;
-  context.log(userId); // TODO: integrate
-
   const queueService = createQueueService(AZURE_STORAGE_CONNECTION_STRING);
   queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, (createErr, createResult, createResponse) => {
     if (createErr) {
