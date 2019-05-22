@@ -5,7 +5,6 @@
   "bin": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-
     "prebuild:get-queue": "tslint -p tsconfig-get-queue.json",
     "build:get-queue": "tsc --build tsconfig-get-queue.json",
     "prebuild:process-queue": "tslint -p tsconfig-process-queue.json",
@@ -15,7 +14,6 @@
     "prebuild:submit-custom": "tslint -p tsconfig-submit-custom.json",
     "build:submit-custom": "tsc --build tsconfig-submit-custom.json",
     "build": "npm run build:get-queue && npm run build:process-queue && npm run build:submit-basic && npm run build:submit-custom",
-
     "predeploy": "npm prune --production",
     "deploy:zip": "zip -q -r deploy.zip *",
     "deploy:upload": "az functionapp deployment source config-zip --subscription \"CDA Global Demos\" --resource-group \"brhugh-led\" -n \"brhugh-led-function-app\" --src ./deploy.zip",

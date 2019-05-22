@@ -105,13 +105,10 @@ async function processBasicAnimation(entry: IBasicQueueEntry) {
 }
 
 async function processCustomAnimation(entry: ICustomQueueEntry) {
-  const endpoint = new URL(entry.submission.functionUrl);
-  endpoint.searchParams.append('authToken', entry.submission.authToken);
-
-  const response = await fetch(URL.createObjectURL(endpoint));
+  const response = await fetch(entry.submission.functionUrl);
   const message: ICustomSubmissionResponse = await response.json();
   if (!validate(message, customSubmissionResponseSchema).valid) {
-    throw new Error(`Received invalid response from user Function, skipping: ${message}`);
+    throw new Error(`Received invalid response from user Function, skipping: ${JSON.stringify(message, null, '  ')}`);
   }
 
   await sendAnimation(message.waveParameters);
@@ -133,6 +130,7 @@ async function processDefaultAnimation() {
 
 const prcoessQueueTrigger: AzureFunction = (context: Context, timer: ITimerRequest): void => {
   const queueService = createQueueService(AZURE_STORAGE_CONNECTION_STRING);
+  context.log('Fetching or creating queue');
   queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, (createErr, createResult, createResponse) => {
     if (createErr) {
       context.done(new Error(`Could not get queue, bailing: ${createErr}`));
@@ -147,6 +145,7 @@ const prcoessQueueTrigger: AzureFunction = (context: Context, timer: ITimerReque
     }
 
     function processMessage(): void {
+      context.log('Getting the next message from the queue');
       // Dequeue the message from the queue, but leave it there. We'll delete it later once we're done processing it.
       // This approach allows us to leave it in the queue but mark it so no one else can process it.
       queueService.getMessage(AZURE_STORAGE_QUEUE_NAME, (getErr, message) => {
@@ -205,6 +204,7 @@ const prcoessQueueTrigger: AzureFunction = (context: Context, timer: ITimerReque
         }
         switch (entry.type) {
           case QueueType.Basic: {
+            context.log('Processing basic animation');
             processBasicAnimation(entry as IBasicQueueEntry)
               .then(() => {
                 context.log('Basic animation sent to the device');
@@ -217,6 +217,7 @@ const prcoessQueueTrigger: AzureFunction = (context: Context, timer: ITimerReque
             break;
           }
           case QueueType.Custom: {
+            context.log('Processing custom animation');
             processCustomAnimation(entry as ICustomQueueEntry)
               .then(() => {
                 context.log('Custom animation sent to the device');

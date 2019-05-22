@@ -85,12 +85,10 @@ async function processBasicAnimation(entry) {
     await sendAnimation(animation);
 }
 async function processCustomAnimation(entry) {
-    const endpoint = new URL(entry.submission.functionUrl);
-    endpoint.searchParams.append('authToken', entry.submission.authToken);
-    const response = await node_fetch_1.default(URL.createObjectURL(endpoint));
+    const response = await node_fetch_1.default(entry.submission.functionUrl);
     const message = await response.json();
     if (!revalidator_1.validate(message, common_1.customSubmissionResponseSchema).valid) {
-        throw new Error(`Received invalid response from user Function, skipping: ${message}`);
+        throw new Error(`Received invalid response from user Function, skipping: ${JSON.stringify(message, null, '  ')}`);
     }
     await sendAnimation(message.waveParameters);
 }
@@ -106,6 +104,7 @@ async function processDefaultAnimation() {
 }
 const prcoessQueueTrigger = (context, timer) => {
     const queueService = azure_storage_1.createQueueService(AZURE_STORAGE_CONNECTION_STRING);
+    context.log('Fetching or creating queue');
     queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, (createErr, createResult, createResponse) => {
         if (createErr) {
             context.done(new Error(`Could not get queue, bailing: ${createErr}`));
@@ -118,6 +117,7 @@ const prcoessQueueTrigger = (context, timer) => {
             return;
         }
         function processMessage() {
+            context.log('Getting the next message from the queue');
             // Dequeue the message from the queue, but leave it there. We'll delete it later once we're done processing it.
             // This approach allows us to leave it in the queue but mark it so no one else can process it.
             queueService.getMessage(AZURE_STORAGE_QUEUE_NAME, (getErr, message) => {
@@ -173,6 +173,7 @@ const prcoessQueueTrigger = (context, timer) => {
                 }
                 switch (entry.type) {
                     case common_1.QueueType.Basic: {
+                        context.log('Processing basic animation');
                         processBasicAnimation(entry)
                             .then(() => {
                             context.log('Basic animation sent to the device');
@@ -185,6 +186,7 @@ const prcoessQueueTrigger = (context, timer) => {
                         break;
                     }
                     case common_1.QueueType.Custom: {
+                        context.log('Processing custom animation');
                         processCustomAnimation(entry)
                             .then(() => {
                             context.log('Custom animation sent to the device');
