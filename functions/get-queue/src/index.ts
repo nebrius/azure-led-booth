@@ -24,7 +24,7 @@ SOFTWARE.
 
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
 import { createQueueService } from 'azure-storage';
-import { getEnvironmentVariable } from './common/common';
+import { getEnvironmentVariable, IBasicQueueEntry, ICustomQueueEntry } from './common/common';
 import { sendErrorResponse } from './util/util';
 
 const AZURE_STORAGE_QUEUE_NAME = getEnvironmentVariable('AZURE_STORAGE_QUEUE_NAME');
@@ -44,8 +44,16 @@ const getQueueTrigger: AzureFunction = (context: Context, req: HttpRequest): voi
         sendErrorResponse(500, 'Could not peek messages in queue', context);
         return;
       }
+      const animations: Array<ICustomQueueEntry | IBasicQueueEntry> = [];
+      for (const message of peekResult) {
+        if (!message.messageText) {
+          sendErrorResponse(500, `Message with ID ${message.messageId} did not have a message body`, context);
+          return;
+        }
+        animations.push(JSON.parse(message.messageText));
+      }
       context.res = {
-        body: JSON.stringify(peekResult)
+        body: JSON.stringify(animations)
       };
       context.done();
     });

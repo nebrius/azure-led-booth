@@ -42,8 +42,16 @@ const getQueueTrigger = (context, req) => {
                 util_1.sendErrorResponse(500, 'Could not peek messages in queue', context);
                 return;
             }
+            const animations = [];
+            for (const message of peekResult) {
+                if (!message.messageText) {
+                    util_1.sendErrorResponse(500, `Message with ID ${message.messageId} did not have a message body`, context);
+                    return;
+                }
+                animations.push(JSON.parse(message.messageText));
+            }
             context.res = {
-                body: JSON.stringify(peekResult)
+                body: JSON.stringify(animations)
             };
             context.done();
         });
