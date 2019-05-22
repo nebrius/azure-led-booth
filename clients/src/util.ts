@@ -29,8 +29,15 @@ const QUEUE_UPDATE_RATE = 10 * 1000;
 // This variable is injected by WebPack, but TypeScript doesn't know that, so we declare the variable here
 declare var API_ENDPOINT: string;
 
-export async function api(endpoint: string, method: 'get' | 'post', parameters?: { [ key: string ]: string }) {
-  const response = await fetch(API_ENDPOINT + endpoint);
+export async function api(endpoint: string, method: 'GET' | 'POST', body?: { [ key: string ]: string }) {
+  const options: RequestInit = { method };
+  if (method === 'POST' && body) {
+    options.headers = {
+      'Content-Type': 'application/json'
+    };
+    options.body = JSON.stringify(body);
+  }
+  const response = await fetch(API_ENDPOINT + endpoint, options);
   return await response.json();
 }
 
@@ -44,7 +51,7 @@ export function onQueueUpdated(cb: () => void): void {
 
 export async function updateQueue() {
   clearTimeout(updateTimeout);
-  queue = await api('get-queue', 'get');
+  queue = await api('get-queue', 'GET');
   if (queueUpdatedListener) {
     queueUpdatedListener();
   }

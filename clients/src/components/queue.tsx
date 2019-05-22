@@ -24,6 +24,7 @@ SOFTWARE.
 
 import * as React from 'react';
 import { getCurrentQueue } from '../util';
+import { reduce } from 'conditional-reduce';
 
 export function QueueComponent(): JSX.Element {
   // I know, I know, this isn't idiomatic React. Just pretend this is a container in Redux ;-P
@@ -32,11 +33,14 @@ export function QueueComponent(): JSX.Element {
     <div className="queue">
       <div className="queue-header"><h2>Queue</h2></div>
       <div className="queue-list">
-        {queue.map((queueEntry, key) => (
-          <div className="queue-entry" key={key}>
-            {key + 1}. {queueEntry.submission.displayName}
-          </div>
-        ))}
+        {reduce<JSX.Element[]>(queue.length.toString(),
+          { 0: () => ([ <div>Queue is empty.</div> ]) },
+          () => queue.map((queueEntry, key) => (
+            <div className="queue-entry" key={key}>
+              {key + 1}. {queueEntry.submission.displayName}
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
