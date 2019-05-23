@@ -33,7 +33,7 @@ const LED_NUM_PIXELS = 64;
 const NUM_WAVES = 4;
 
 const startTime = Date.now();
-let waveParameters: IWaveParameters = createWaveParameters(createMovingWave(0, 255, 1, 16));
+let waveParameters: IWaveParameters = createWaveParameters(createMovingWave(0, 255, 8, 16));
 
 function onWaveParametersUpdated(newWaveParameters: IWaveParameters) {
   waveParameters = newWaveParameters;
@@ -50,9 +50,6 @@ function renderApp(colors: IColor[]) {
 
 function calculatePixelValue(wave: IWaveChannel, t: number, x: number): number {
   const coefficient = wave.w_t * t / 100 + wave.w_x * x + wave.phi;
-  if (coefficient) {
-    console.log(coefficient);
-  }
   return wave.a * (Math.sin(2 * Math.PI * coefficient / 512) + 1) / 2 + wave.b;
 }
 
