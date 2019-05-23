@@ -85,7 +85,12 @@ async function processBasicAnimation(entry) {
     await sendAnimation(animation);
 }
 async function processCustomAnimation(entry) {
-    const response = await node_fetch_1.default(entry.submission.functionUrl);
+    const response = await node_fetch_1.default(entry.submission.functionUrl, {
+        method: 'POST',
+        body: JSON.stringify({
+            apiKey: entry.submission.apiKey
+        })
+    });
     const message = await response.json();
     if (!revalidator_1.validate(message, common_1.customSubmissionResponseSchema).valid) {
         throw new Error(`Received invalid response from user Function, skipping: ${JSON.stringify(message, null, '  ')}`);

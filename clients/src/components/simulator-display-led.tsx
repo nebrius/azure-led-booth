@@ -23,12 +23,11 @@ SOFTWARE.
 */
 
 import * as React from 'react';
-import { hsl } from 'color-convert';
 
 export interface IColor {
-  hue: number;
-  saturation: number;
-  value: number;
+  r: number;
+  g: number;
+  b: number;
 }
 
 export interface ILEDContainerComponentProps {
@@ -39,11 +38,10 @@ export interface ILEDContainerComponentProps {
 export function LEDContainerComponent(props: ILEDContainerComponentProps): JSX.Element {
   const leds: JSX.Element[] = [];
   for (let i = 0; i < props.numLEDS; i++) {
-    const color = hsl.rgb([ props.colors[i].hue, props.colors[i].saturation, props.colors[i].value ]);
     const style = {
-      'background-color': `rgb(${color[0]}, ${color[1]}, ${color[2]})`
+      backgroundColor: `rgb(${props.colors[i].r}, ${props.colors[i].g}, ${props.colors[i].b})`
     };
-    leds.unshift(<div className="display-led" key={i} style={style as any} />);
+    leds.unshift(<div className="display-led" key={i} style={style} />);
   }
   return (
     <div className="display-led-container">

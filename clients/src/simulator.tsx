@@ -25,11 +25,15 @@ SOFTWARE.
 import * as React from 'react';
 import { render } from 'react-dom';
 import { AppComponent, IColor } from './components/simulator-app';
-import { IWaveParameters } from 'rvl-node-types';
-import { createWaveParameters, createSolidColorWave } from 'rvl-node-animations';
+import { IWaveParameters, IWaveChannel } from 'rvl-node-types';
+import { createWaveParameters, createMovingWave } from 'rvl-node-animations';
+import { hsv } from 'color-convert';
+
+const LED_NUM_PIXELS = 64;
+const NUM_WAVES = 4;
 
 const startTime = Date.now();
-let waveParameters: IWaveParameters = createWaveParameters(createSolidColorWave(0, 0, 0, 255));
+let waveParameters: IWaveParameters = createWaveParameters(createMovingWave(0, 255, 1, 16));
 
 function onWaveParametersUpdated(newWaveParameters: IWaveParameters) {
   waveParameters = newWaveParameters;
@@ -44,35 +48,56 @@ function renderApp(colors: IColor[]) {
   );
 }
 
-setInterval(() => {
-  const animationTime = Date.now() - startTime;
-  const colors: IColor[] = [
-    { hue: 0, saturation: 100, value: 100 },
-    { hue: 12, saturation: 100, value: 100 },
-    { hue: 24, saturation: 100, value: 100 },
-    { hue: 36, saturation: 100, value: 100 },
-    { hue: 48, saturation: 100, value: 100 },
-    { hue: 60, saturation: 100, value: 100 },
-    { hue: 72, saturation: 100, value: 100 },
-    { hue: 84, saturation: 100, value: 100 },
-    { hue: 96, saturation: 100, value: 100 },
-    { hue: 108, saturation: 100, value: 100 },
-    { hue: 120, saturation: 100, value: 100 },
-    { hue: 132, saturation: 100, value: 100 },
-    { hue: 144, saturation: 100, value: 100 },
-    { hue: 156, saturation: 100, value: 100 },
-    { hue: 168, saturation: 100, value: 100 },
-    { hue: 180, saturation: 100, value: 100 },
-    { hue: 192, saturation: 100, value: 100 },
-    { hue: 204, saturation: 100, value: 100 },
-    { hue: 216, saturation: 100, value: 100 },
-    { hue: 228, saturation: 100, value: 100 },
-    { hue: 240, saturation: 100, value: 100 },
-    { hue: 252, saturation: 100, value: 100 },
-    { hue: 264, saturation: 100, value: 100 },
-    { hue: 276, saturation: 100, value: 100 }
-  ];
-  console.log(animationTime);
+function calculatePixelValue(wave: IWaveChannel, t: number, x: number): number {
+  const coefficient = wave.w_t * t / 100 + wave.w_x * x + wave.phi;
+  if (coefficient) {
+    console.log(coefficient);
+  }
+  return wave.a * (Math.sin(2 * Math.PI * coefficient / 512) + 1) / 2 + wave.b;
+}
 
+function blend(color1: number, color2: number, alpha: number): number {
+  alpha = alpha / 255;
+  color1 = color1 / 255;
+  color2 = color2 / 255;
+  return Math.round(255 * (color1 * alpha + color2 * (1 - alpha)));
+}
+
+setInterval(() => {
+  const animationClock = Date.now() - startTime;
+  if (!waveParameters.timePeriod) {
+    waveParameters.timePeriod = 255;
+  }
+  if (!waveParameters.distancePeriod) {
+    waveParameters.distancePeriod = 32;
+  }
+  const colors: IColor[] = [];
+  const t = animationClock % 25500;
+  for (let i = 0; i < LED_NUM_PIXELS; i++) {
+    const pixelColorLayers: IColor[] = [];
+    const alphaValuesLayers: number[] = [];
+
+    for (let j = 0; j < NUM_WAVES; j++) {
+      const pixelColor = hsv.rgb([
+        calculatePixelValue(waveParameters.waves[j].h, t, i),
+        calculatePixelValue(waveParameters.waves[j].s, t, i),
+        calculatePixelValue(waveParameters.waves[j].v, t, i)
+      ]);
+      pixelColorLayers[j] = {
+        r: pixelColor[0],
+        g: pixelColor[1],
+        b: pixelColor[2]
+      };
+      alphaValuesLayers[j] = calculatePixelValue(waveParameters.waves[j].a, t, i);
+    }
+    colors[i] = pixelColorLayers[NUM_WAVES - 1];
+    for (let j = NUM_WAVES - 2; j >= 0; j--) {
+      colors[i] = {
+        r: blend(colors[i].r, pixelColorLayers[j].r, alphaValuesLayers[j]),
+        g: blend(colors[i].g, pixelColorLayers[j].g, alphaValuesLayers[j]),
+        b: blend(colors[i].b, pixelColorLayers[j].b, alphaValuesLayers[j]),
+      };
+    }
+  }
   renderApp(colors);
 }, 33);

@@ -25,11 +25,13 @@ SOFTWARE.
 import * as React from 'react';
 import { ICustomSubmission } from '../common/common';
 import { api, updateQueue } from '../util';
+import * as uuidv4 from 'uuid/v4';
 
 export class SubmissionComponent extends React.Component<{}, ICustomSubmission> {
 
   public state = {
     functionUrl: '',
+    apiKey: uuidv4(),
     displayName: ''
   };
 
@@ -44,6 +46,13 @@ export class SubmissionComponent extends React.Component<{}, ICustomSubmission> 
             id="displayNameInput"
             value={this.state.functionUrl}
             onChange={this._handleFunctionUrlChanged} />
+
+          <label htmlFor="apiKeyInput">API Key:</label>
+          <input
+            type="text"
+            id="apiKeyInputInput"
+            value={this.state.apiKey}
+            onChange={this._handleApiKeyChanged} />
 
           <label htmlFor="displayNameInput">Display Name:</label>
           <input
@@ -66,6 +75,17 @@ export class SubmissionComponent extends React.Component<{}, ICustomSubmission> 
       const newState = {
         ...previousState,
         functionUrl
+      };
+      return newState;
+    });
+  }
+
+  private _handleApiKeyChanged = (event: React.FormEvent<HTMLInputElement>) => {
+    const apiKey = event.currentTarget.value;
+    this.setState((previousState) => {
+      const newState = {
+        ...previousState,
+        apiKey
       };
       return newState;
     });

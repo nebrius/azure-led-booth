@@ -19,6 +19,7 @@
     "@types/color-convert": "^1.9.0",
     "@types/react": "^16.8.14",
     "@types/react-dom": "^16.8.4",
+    "@types/uuid": "^3.4.4",
     "cpy-cli": "^2.0.0",
     "http-server": "^0.11.1",
     "rvl-node-types": "^1.0.0",
@@ -32,7 +33,8 @@
     "color-convert": "^2.0.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "rvl-node-animations": "^1.0.1"
+    "rvl-node-animations": "^1.0.1",
+    "uuid": "^3.3.2"
   },
   "author": "Bryan Hughes <bryan@nebri.us>",
   "license": "MIT"

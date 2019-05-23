@@ -105,12 +105,16 @@ async function processBasicAnimation(entry: IBasicQueueEntry) {
 }
 
 async function processCustomAnimation(entry: ICustomQueueEntry) {
-  const response = await fetch(entry.submission.functionUrl);
+  const response = await fetch(entry.submission.functionUrl, {
+    method: 'POST',
+    body: JSON.stringify({
+      apiKey: entry.submission.apiKey
+    })
+  });
   const message: ICustomSubmissionResponse = await response.json();
   if (!validate(message, customSubmissionResponseSchema).valid) {
     throw new Error(`Received invalid response from user Function, skipping: ${JSON.stringify(message, null, '  ')}`);
   }
-
   await sendAnimation(message.waveParameters);
 }
 

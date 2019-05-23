@@ -33,13 +33,15 @@ const submitSimulationTrigger = async (context, req) => {
         util_1.sendErrorResponse(400, 'Invalid submission', context);
         return;
     }
-    const response = await node_fetch_1.default(message.functionUrl);
+    const response = await node_fetch_1.default(message.functionUrl, {
+        method: 'POST'
+    });
     const responseMessage = await response.json();
     if (!revalidator_1.validate(responseMessage, common_1.customSubmissionResponseSchema).valid) {
         throw new Error(`Received invalid response from user Function, skipping: ${JSON.stringify(message, null, '  ')}`);
     }
     context.res = {
-        body: JSON.stringify(responseMessage)
+        body: JSON.stringify(responseMessage.waveParameters)
     };
     context.done();
 };
