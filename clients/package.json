@@ -5,12 +5,13 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "tslint -p tsconfig.json",
+    "build-wasm": "emcc -s WASM=1 -s ONLY_MY_CODE=1 -s EXPORTED_FUNCTIONS=\"['_calculatePixelValue']\" -o src/calculatePixelValue.wasm src-wasm/main.c",
     "build-static": "cpy static/**/* dist/",
     "prebuild-prod": "npm run lint",
-    "build-prod": "webpack --mode=production",
+    "build-prod": "npm run build-wasm && webpack --mode=production",
     "postbuild-prod": "npm run build-static",
     "prebuild-dev": "npm run lint",
-    "build-dev": "webpack --mode=development",
+    "build-dev": "npm run build-wasm && webpack --mode=development",
     "postbuild-dev": "npm run build-static",
     "deploy": "az storage blob upload-batch -s ./dist -d \\$web --account-name brhughledstorage",
     "start": "http-server ./dist"
@@ -26,6 +27,7 @@
     "ts-loader": "^5.3.3",
     "tslint": "^5.16.0",
     "typescript": "^3.4.4",
+    "wasm-loader": "^1.3.0",
     "webpack": "^4.30.0",
     "webpack-cli": "^3.3.0"
   },

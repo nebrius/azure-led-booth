@@ -25,9 +25,10 @@ SOFTWARE.
 import * as React from 'react';
 import { render } from 'react-dom';
 import { AppComponent, IColor } from './components/simulator-app';
-import { IWaveParameters, IWaveChannel } from 'rvl-node-types';
+import { IWaveParameters } from 'rvl-node-types';
 import { createWaveParameters, createMovingWave } from 'rvl-node-animations';
 import { hsv } from 'color-convert';
+import { init } from './calculatePixelValue';
 
 const LED_NUM_PIXELS = 64;
 const NUM_WAVES = 4;
@@ -48,11 +49,6 @@ function renderApp(colors: IColor[]) {
   );
 }
 
-function calculatePixelValue(wave: IWaveChannel, t: number, x: number): number {
-  const coefficient = wave.w_t * t / 100 + wave.w_x * x + wave.phi;
-  return wave.a * (Math.sin(2 * Math.PI * coefficient / 512) + 1) / 2 + wave.b;
-}
-
 function blend(color1: number, color2: number, alpha: number): number {
   alpha = alpha / 255;
   color1 = color1 / 255;
@@ -60,41 +56,71 @@ function blend(color1: number, color2: number, alpha: number): number {
   return Math.round(255 * (color1 * alpha + color2 * (1 - alpha)));
 }
 
-setInterval(() => {
-  const animationClock = Date.now() - startTime;
-  if (!waveParameters.timePeriod) {
-    waveParameters.timePeriod = 255;
-  }
-  if (!waveParameters.distancePeriod) {
-    waveParameters.distancePeriod = 32;
-  }
-  const colors: IColor[] = [];
-  const t = animationClock % 25500;
-  for (let i = 0; i < LED_NUM_PIXELS; i++) {
-    const pixelColorLayers: IColor[] = [];
-    const alphaValuesLayers: number[] = [];
+init().then((calculatePixelValue) => {
+  setInterval(() => {
+    const animationClock = Date.now() - startTime;
+    if (!waveParameters.timePeriod) {
+      waveParameters.timePeriod = 255;
+    }
+    if (!waveParameters.distancePeriod) {
+      waveParameters.distancePeriod = 32;
+    }
+    const colors: IColor[] = [];
+    const t = animationClock % 25500;
+    for (let i = 0; i < LED_NUM_PIXELS; i++) {
+      const pixelColorLayers: IColor[] = [];
+      const alphaValuesLayers: number[] = [];
 
-    for (let j = 0; j < NUM_WAVES; j++) {
-      const pixelColor = hsv.rgb([
-        calculatePixelValue(waveParameters.waves[j].h, t, i),
-        calculatePixelValue(waveParameters.waves[j].s, t, i),
-        calculatePixelValue(waveParameters.waves[j].v, t, i)
-      ]);
-      pixelColorLayers[j] = {
-        r: pixelColor[0],
-        g: pixelColor[1],
-        b: pixelColor[2]
-      };
-      alphaValuesLayers[j] = calculatePixelValue(waveParameters.waves[j].a, t, i);
+      for (let j = 0; j < NUM_WAVES; j++) {
+        const pixelColor = hsv.rgb([
+          calculatePixelValue(
+            waveParameters.waves[j].h.a,
+            waveParameters.waves[j].h.w_t,
+            waveParameters.waves[j].h.w_x,
+            waveParameters.waves[j].h.phi,
+            waveParameters.waves[j].h.b,
+            t,
+            i),
+          calculatePixelValue(
+            waveParameters.waves[j].s.a,
+            waveParameters.waves[j].s.w_t,
+            waveParameters.waves[j].s.w_x,
+            waveParameters.waves[j].s.phi,
+            waveParameters.waves[j].s.b,
+            t,
+            i),
+          calculatePixelValue(
+            waveParameters.waves[j].v.a,
+            waveParameters.waves[j].v.w_t,
+            waveParameters.waves[j].v.w_x,
+            waveParameters.waves[j].v.phi,
+            waveParameters.waves[j].v.b,
+            t,
+            i)
+        ]);
+        pixelColorLayers[j] = {
+          r: pixelColor[0],
+          g: pixelColor[1],
+          b: pixelColor[2]
+        };
+        alphaValuesLayers[j] = calculatePixelValue(
+          waveParameters.waves[j].a.a,
+          waveParameters.waves[j].a.w_t,
+          waveParameters.waves[j].a.w_x,
+          waveParameters.waves[j].a.phi,
+          waveParameters.waves[j].a.b,
+          t,
+          i);
+      }
+      colors[i] = pixelColorLayers[NUM_WAVES - 1];
+      for (let j = NUM_WAVES - 2; j >= 0; j--) {
+        colors[i] = {
+          r: blend(colors[i].r, pixelColorLayers[j].r, alphaValuesLayers[j]),
+          g: blend(colors[i].g, pixelColorLayers[j].g, alphaValuesLayers[j]),
+          b: blend(colors[i].b, pixelColorLayers[j].b, alphaValuesLayers[j]),
+        };
+      }
     }
-    colors[i] = pixelColorLayers[NUM_WAVES - 1];
-    for (let j = NUM_WAVES - 2; j >= 0; j--) {
-      colors[i] = {
-        r: blend(colors[i].r, pixelColorLayers[j].r, alphaValuesLayers[j]),
-        g: blend(colors[i].g, pixelColorLayers[j].g, alphaValuesLayers[j]),
-        b: blend(colors[i].b, pixelColorLayers[j].b, alphaValuesLayers[j]),
-      };
-    }
-  }
-  renderApp(colors);
-}, 33);
+    renderApp(colors);
+  }, 33);
+});
