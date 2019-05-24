@@ -23,6 +23,18 @@ SOFTWARE.
 */
 
 export async function init() {
-  const mod = await import('./calculatePixelValue.wasm');
-  return mod.calculatePixelValue;
+  const response = await fetch('/calculatePixelValue.wasm');
+  const buffer = await response.arrayBuffer();
+  const memory = new WebAssembly.Memory({ initial: 256, maximum: 256 });
+  const env = {
+    abortStackOverflow: (err: string) => { throw new Error(`overflow: ${err}`); },
+    table: new WebAssembly.Table({ initial: 0, maximum: 0, element: 'anyfunc' }),
+    __table_base: 0,
+    memory,
+    __memory_base: 1024,
+    STACKTOP: 0,
+    STACK_MAX: memory.buffer.byteLength,
+  };
+  const mod = await WebAssembly.instantiate(buffer, { env });
+  return mod.instance.exports._calculatePixelValue;
 }
