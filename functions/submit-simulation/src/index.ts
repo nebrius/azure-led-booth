@@ -44,7 +44,9 @@ const submitSimulationTrigger: AzureFunction = async (context: Context, req: Htt
   });
   const responseMessage: ICustomSubmissionResponse = await response.json();
   if (!validate(responseMessage, customSubmissionResponseSchema).valid) {
-    throw new Error(`Received invalid response from user Function, skipping: ${JSON.stringify(message, null, '  ')}`);
+    sendErrorResponse(400,
+      `Received invalid response from user Function: ${JSON.stringify(message, null, '  ')}`, context);
+    return;
   }
   context.res = {
     body: JSON.stringify(responseMessage.waveParameters)
