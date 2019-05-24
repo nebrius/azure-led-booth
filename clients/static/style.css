@@ -134,7 +134,7 @@ SOFTWARE.
   border: 1px solid black;
   border-radius: 2px;
   height: fit-content;
-  background-color: #888;
+  background-color: black;
   margin: 10px 10px 0 10px;
 }
 
@@ -143,10 +143,15 @@ SOFTWARE.
   padding: 5px;
 }
 
+.display-led-stack {
+  position: relative;
+  width: 25px;
+  height: 25px;
+}
+
 .display-led {
+  position: absolute;
   width: 25px;
   height: 25px;
   border-radius: 25px;
-  margin: 5px;
-  background-color: #00ff00;
 }

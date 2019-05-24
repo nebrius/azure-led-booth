@@ -30,7 +30,7 @@ import { IWaveParameters } from 'rvl-node-types';
 export { IColor } from './simulator-display';
 
 interface IAppComponentProps {
-  colors: IColor[];
+  colors: IColor[][];
   waveParameters: IWaveParameters;
   onWaveParametersUpdated: (waveParameters: IWaveParameters) => void;
 }

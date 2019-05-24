@@ -43,20 +43,13 @@ function onWaveParametersUpdated(newWaveParameters: IWaveParameters) {
   waveParameters = newWaveParameters;
 }
 
-function renderApp(colors: IColor[]) {
+function renderApp(colors: IColor[][]) {
   render(
     (
       <AppComponent colors={colors} waveParameters={waveParameters} onWaveParametersUpdated={onWaveParametersUpdated} />
     ),
     document.getElementById('app')
   );
-}
-
-function blend(color1: number, color2: number, alpha: number): number {
-  alpha = alpha / 255;
-  color1 = color1 / 255;
-  color2 = color2 / 255;
-  return Math.round(255 * (color1 * alpha + color2 * (1 - alpha)));
 }
 
 init().then((calculatePixelValue) => {
@@ -68,11 +61,10 @@ init().then((calculatePixelValue) => {
     if (!waveParameters.distancePeriod) {
       waveParameters.distancePeriod = 32;
     }
-    const colors: IColor[] = [];
+    const colors: IColor[][] = [];
     const t = animationClock % 25500;
     for (let i = 0; i < LED_NUM_PIXELS; i++) {
       const pixelColorLayers: IColor[] = [];
-      const alphaValuesLayers: number[] = [];
 
       for (let j = 0; j < NUM_WAVES; j++) {
         const pixelColor = hsv.rgb([
@@ -104,25 +96,18 @@ init().then((calculatePixelValue) => {
         pixelColorLayers[j] = {
           r: pixelColor[0],
           g: pixelColor[1],
-          b: pixelColor[2]
-        };
-        alphaValuesLayers[j] = calculatePixelValue(
-          waveParameters.waves[j].a.a,
-          waveParameters.waves[j].a.w_t,
-          waveParameters.waves[j].a.w_x,
-          waveParameters.waves[j].a.phi,
-          waveParameters.waves[j].a.b,
-          t,
-          i);
-      }
-      colors[i] = pixelColorLayers[NUM_WAVES - 1];
-      for (let j = NUM_WAVES - 2; j >= 0; j--) {
-        colors[i] = {
-          r: blend(colors[i].r, pixelColorLayers[j].r, alphaValuesLayers[j]),
-          g: blend(colors[i].g, pixelColorLayers[j].g, alphaValuesLayers[j]),
-          b: blend(colors[i].b, pixelColorLayers[j].b, alphaValuesLayers[j]),
+          b: pixelColor[2],
+          a: calculatePixelValue(
+            waveParameters.waves[j].a.a,
+            waveParameters.waves[j].a.w_t,
+            waveParameters.waves[j].a.w_x,
+            waveParameters.waves[j].a.phi,
+            waveParameters.waves[j].a.b,
+            t,
+            i)
         };
       }
+      colors[i] = pixelColorLayers;
     }
     renderApp(colors);
   }, 33);

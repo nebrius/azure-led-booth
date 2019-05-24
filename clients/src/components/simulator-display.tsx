@@ -28,7 +28,7 @@ import { LEDContainerComponent, IColor } from './simulator-display-led';
 export { IColor } from './simulator-display-led';
 
 interface IDisplayComponentProps {
-  colors: IColor[];
+  colors: IColor[][];
 }
 
 export function DisplayComponent(props: IDisplayComponentProps): JSX.Element {

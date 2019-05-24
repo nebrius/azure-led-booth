@@ -28,20 +28,31 @@ export interface IColor {
   r: number;
   g: number;
   b: number;
+  a: number;
 }
 
 export interface ILEDContainerComponentProps {
   numLEDS: number;
-  colors: IColor[];
+  colors: IColor[][];
+}
+
+function createStyle(color: IColor) {
+  return {
+    backgroundColor: `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a / 255})`
+  };
 }
 
 export function LEDContainerComponent(props: ILEDContainerComponentProps): JSX.Element {
   const leds: JSX.Element[] = [];
   for (let i = 0; i < props.numLEDS; i++) {
-    const style = {
-      backgroundColor: `rgb(${props.colors[i].r}, ${props.colors[i].g}, ${props.colors[i].b})`
-    };
-    leds.unshift(<div className="display-led" key={i} style={style} />);
+    leds.unshift(
+      <div className="display-led-stack" key={i}>
+        <div className="display-led" key={0} style={createStyle(props.colors[i][3])} />
+        <div className="display-led" key={1} style={createStyle(props.colors[i][2])} />
+        <div className="display-led" key={2} style={createStyle(props.colors[i][1])} />
+        <div className="display-led" key={3} style={createStyle(props.colors[i][0])} />
+      </div>
+    );
   }
   return (
     <div className="display-led-container">
