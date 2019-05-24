@@ -26,7 +26,7 @@ import * as React from 'react';
 import { render } from 'react-dom';
 import { AppComponent, IColor } from './components/simulator-app';
 import { IWaveParameters } from 'rvl-node-types';
-import { createWaveParameters, createMovingWave } from 'rvl-node-animations';
+import { createWaveParameters, createMovingWave, createSolidColorWave } from 'rvl-node-animations';
 import { hsv } from 'color-convert';
 import { init } from './calculatePixelValue';
 
@@ -34,7 +34,10 @@ const LED_NUM_PIXELS = 64;
 const NUM_WAVES = 4;
 
 const startTime = Date.now();
-let waveParameters: IWaveParameters = createWaveParameters(createMovingWave(0, 255, 8, 16));
+let waveParameters: IWaveParameters = createWaveParameters(
+  createMovingWave(0, 255, 8, 16),
+  createSolidColorWave(128, 255, 255, 255)
+);
 
 function onWaveParametersUpdated(newWaveParameters: IWaveParameters) {
   waveParameters = newWaveParameters;
@@ -73,30 +76,30 @@ init().then((calculatePixelValue) => {
 
       for (let j = 0; j < NUM_WAVES; j++) {
         const pixelColor = hsv.rgb([
-          calculatePixelValue(
+          Math.round(calculatePixelValue(
             waveParameters.waves[j].h.a,
             waveParameters.waves[j].h.w_t,
             waveParameters.waves[j].h.w_x,
             waveParameters.waves[j].h.phi,
             waveParameters.waves[j].h.b,
             t,
-            i),
-          calculatePixelValue(
+            i) * 360 / 255),
+          Math.round(calculatePixelValue(
             waveParameters.waves[j].s.a,
             waveParameters.waves[j].s.w_t,
             waveParameters.waves[j].s.w_x,
             waveParameters.waves[j].s.phi,
             waveParameters.waves[j].s.b,
             t,
-            i),
-          calculatePixelValue(
+            i) * 100 / 255),
+          Math.round(calculatePixelValue(
             waveParameters.waves[j].v.a,
             waveParameters.waves[j].v.w_t,
             waveParameters.waves[j].v.w_x,
             waveParameters.waves[j].v.phi,
             waveParameters.waves[j].v.b,
             t,
-            i)
+            i) * 100 / 255)
         ]);
         pixelColorLayers[j] = {
           r: pixelColor[0],
