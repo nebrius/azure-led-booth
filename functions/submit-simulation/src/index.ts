@@ -23,20 +23,21 @@ SOFTWARE.
 */
 
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
-import { sendErrorResponse } from './util/util';
+import { sendErrorResponse, submitStat } from './util/util';
 import { validate } from 'revalidator';
 import {
   ISimulationSubmission,
   simulationSubmissionSchema,
   ICustomSubmissionResponse,
-  customSubmissionResponseSchema
+  customSubmissionResponseSchema,
+  StatType
 } from './common/common';
 import fetch from 'node-fetch';
 
 const submitSimulationTrigger: AzureFunction = async (context: Context, req: HttpRequest) => {
   const message: ISimulationSubmission = req.body;
   if (!validate(message, simulationSubmissionSchema).valid) {
-    sendErrorResponse(400, 'Invalid submission', context);
+    sendErrorResponse(400, 'Invalid submission', context, StatType.Simulation);
     return;
   }
   const response = await fetch(message.functionUrl, {
@@ -44,14 +45,19 @@ const submitSimulationTrigger: AzureFunction = async (context: Context, req: Htt
   });
   const responseMessage: ICustomSubmissionResponse = await response.json();
   if (!validate(responseMessage, customSubmissionResponseSchema).valid) {
-    sendErrorResponse(400,
-      `Received invalid response from user Function: ${JSON.stringify(message, null, '  ')}`, context);
+    sendErrorResponse(
+      400,
+      `Received invalid response from user Function: ${JSON.stringify(message, null, '  ')}`,
+      context,
+      StatType.Simulation);
     return;
   }
-  context.res = {
-    body: JSON.stringify(responseMessage.waveParameters)
-  };
-  context.done();
+  submitStat({ statusCode: 200, type: StatType.Simulation }, context, () => {
+    context.res = {
+      body: JSON.stringify(responseMessage.waveParameters)
+    };
+    context.done();
+  });
 };
 
 export default submitSimulationTrigger;

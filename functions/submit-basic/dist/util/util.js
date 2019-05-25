@@ -23,9 +23,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 Object.defineProperty(exports, "__esModule", { value: true });
-function sendErrorResponse(status, body, context) {
+const azure_storage_1 = require("azure-storage");
+const common_1 = require("../common/common");
+const uuid_1 = require("uuid");
+const AZURE_STORAGE_TABLE_NAME = common_1.getEnvironmentVariable('AZURE_STORAGE_TABLE_NAME');
+function sendErrorResponse(status, body, context, statType) {
     context.res = { status, body };
-    context.done();
+    if (statType) {
+        submitStat({ statusCode: status, type: statType }, context, () => context.done());
+    }
 }
 exports.sendErrorResponse = sendErrorResponse;
+function submitStat(stat, context, cb) {
+    const tableService = azure_storage_1.createTableService();
+    tableService.createTableIfNotExists(AZURE_STORAGE_TABLE_NAME, (createErr) => {
+        if (createErr) {
+            context.log(`Could not get stats table: ${createErr}`);
+            cb();
+            return;
+        }
+        const entity = {
+            PartitionKey: azure_storage_1.TableUtilities.entityGenerator.String(AZURE_STORAGE_TABLE_NAME),
+            RowKey: azure_storage_1.TableUtilities.entityGenerator.String(uuid_1.v4()),
+            type: azure_storage_1.TableUtilities.entityGenerator.String(stat.type),
+            statusCode: azure_storage_1.TableUtilities.entityGenerator.Int32(stat.statusCode)
+        };
+        tableService.insertEntity(AZURE_STORAGE_TABLE_NAME, entity, (insertErr) => {
+            if (insertErr) {
+                context.log(`Could not insert stats entity: ${insertErr}`);
+            }
+            cb();
+        });
+    });
+}
+exports.submitStat = submitStat;
 //# sourceMappingURL=util.js.map

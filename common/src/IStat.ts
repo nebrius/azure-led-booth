@@ -1,4 +1,3 @@
-"use strict";
 /*
 MIT License
 
@@ -22,14 +21,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+
+export enum StatType {
+  Basic = 'basic',
+  Custom = 'custom',
+  Simulation = 'simulation'
 }
-Object.defineProperty(exports, "__esModule", { value: true });
-__export(require("./src/util"));
-__export(require("./src/IBasicSubmission"));
-__export(require("./src/ICustomSubmission"));
-__export(require("./src/ISimulationSubmission"));
-__export(require("./src/IQueue"));
-__export(require("./src/IStat"));
-//# sourceMappingURL=common.js.map
+
+export interface IStat {
+  type: StatType;
+  statusCode: number;
+}

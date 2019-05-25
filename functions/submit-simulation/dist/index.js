@@ -30,7 +30,7 @@ const node_fetch_1 = require("node-fetch");
 const submitSimulationTrigger = async (context, req) => {
     const message = req.body;
     if (!revalidator_1.validate(message, common_1.simulationSubmissionSchema).valid) {
-        util_1.sendErrorResponse(400, 'Invalid submission', context);
+        util_1.sendErrorResponse(400, 'Invalid submission', context, common_1.StatType.Simulation);
         return;
     }
     const response = await node_fetch_1.default(message.functionUrl, {
@@ -38,13 +38,15 @@ const submitSimulationTrigger = async (context, req) => {
     });
     const responseMessage = await response.json();
     if (!revalidator_1.validate(responseMessage, common_1.customSubmissionResponseSchema).valid) {
-        util_1.sendErrorResponse(400, `Received invalid response from user Function: ${JSON.stringify(message, null, '  ')}`, context);
+        util_1.sendErrorResponse(400, `Received invalid response from user Function: ${JSON.stringify(message, null, '  ')}`, context, common_1.StatType.Simulation);
         return;
     }
-    context.res = {
-        body: JSON.stringify(responseMessage.waveParameters)
-    };
-    context.done();
+    util_1.submitStat({ statusCode: 200, type: common_1.StatType.Simulation }, context, () => {
+        context.res = {
+            body: JSON.stringify(responseMessage.waveParameters)
+        };
+        context.done();
+    });
 };
 exports.default = submitSimulationTrigger;
 //# sourceMappingURL=index.js.map

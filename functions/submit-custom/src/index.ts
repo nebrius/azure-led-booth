@@ -30,9 +30,10 @@ import {
   customSubmissionSchema,
   ICustomSubmission,
   ICustomQueueEntry,
+  StatType,
   QueueType
 } from './common/common';
-import { sendErrorResponse } from './util/util';
+import { sendErrorResponse, submitStat } from './util/util';
 
 const AZURE_STORAGE_QUEUE_NAME = getEnvironmentVariable('AZURE_STORAGE_QUEUE_NAME');
 const AZURE_STORAGE_CONNECTION_STRING = getEnvironmentVariable('AZURE_STORAGE_CONNECTION_STRING');
@@ -41,14 +42,14 @@ const submitCustomTrigger: AzureFunction = (context: Context, req: HttpRequest):
 
   const message: ICustomSubmission = req.body;
   if (!validate(message, customSubmissionSchema).valid) {
-    sendErrorResponse(400, 'Invalid submission', context);
+    sendErrorResponse(400, 'Invalid submission', context, StatType.Custom);
     return;
   }
 
   const queueService = createQueueService(AZURE_STORAGE_CONNECTION_STRING);
   queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, (createErr, createResult, createResponse) => {
     if (createErr) {
-      sendErrorResponse(500, 'Could not get queue', context);
+      sendErrorResponse(500, 'Could not get queue', context, StatType.Custom);
       return;
     }
     const entry: ICustomQueueEntry = {
@@ -58,13 +59,15 @@ const submitCustomTrigger: AzureFunction = (context: Context, req: HttpRequest):
     };
     queueService.createMessage(AZURE_STORAGE_QUEUE_NAME, JSON.stringify(entry), (addErr, addResult, addResponse) => {
       if (addErr) {
-        sendErrorResponse(500, 'Could not add message to queue', context);
+        sendErrorResponse(500, 'Could not add message to queue', context, StatType.Custom);
         return;
       }
-      context.res = {
-        body: JSON.stringify({ status: 'ok' })
-      };
-      context.done();
+      submitStat({ statusCode: 200, type: StatType.Custom }, context, () => {
+        context.res = {
+          body: JSON.stringify({ status: 'ok' })
+        };
+        context.done();
+      });
     });
   });
 };

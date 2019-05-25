@@ -31,4 +31,5 @@ __export(require("./src/IBasicSubmission"));
 __export(require("./src/ICustomSubmission"));
 __export(require("./src/ISimulationSubmission"));
 __export(require("./src/IQueue"));
+__export(require("./src/IStat"));
 //# sourceMappingURL=common.js.map
