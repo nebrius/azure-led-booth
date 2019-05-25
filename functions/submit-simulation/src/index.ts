@@ -41,7 +41,13 @@ const submitSimulationTrigger: AzureFunction = async (context: Context, req: Htt
     return;
   }
   const response = await fetch(message.functionUrl, {
-    method: 'POST'
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      apiKey: message.apiKey
+    })
   });
   const responseMessage: ICustomSubmissionResponse = await response.json();
   if (!validate(responseMessage, customSubmissionResponseSchema).valid) {

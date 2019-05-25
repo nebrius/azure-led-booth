@@ -25,6 +25,7 @@ SOFTWARE.
 // This is what's sent from the Azure Function creator's browser to the server to add to the queue
 export interface ISimulationSubmission {
   functionUrl: string;
+  apiKey: string;
 }
 
 // Force to "any" type, otherwise TypeScript thinks the type is too strict and won't ever compile

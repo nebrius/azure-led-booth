@@ -25,20 +25,18 @@ SOFTWARE.
 import * as React from 'react';
 import { api } from '../util';
 import { IWaveParameters } from 'rvl-node-types';
+import { ISimulationSubmission } from '../common/common';
 
 interface IControlsComponentProps {
   onWaveParametersUpdated: (waveParamters: IWaveParameters) => void;
   waveParameters: IWaveParameters;
 }
 
-interface IControlsComponentState {
-  functionUrl: string;
-}
-
-export class ControlsComponent extends React.Component<IControlsComponentProps, IControlsComponentState> {
+export class ControlsComponent extends React.Component<IControlsComponentProps, ISimulationSubmission> {
 
   public state = {
-    functionUrl: ''
+    functionUrl: '',
+    apiKey: ''
   };
 
   public render() {
@@ -52,6 +50,13 @@ export class ControlsComponent extends React.Component<IControlsComponentProps, 
             id="displayNameInput"
             value={this.state.functionUrl}
             onChange={this._handleFunctionUrlChanged} />
+
+          <label htmlFor="displayNameInput">API Key:</label>
+          <input
+            type="text"
+            id="displayNameInput"
+            value={this.state.apiKey}
+            onChange={this._handleApiKeyChanged} />
 
           <div>
             <button type="submit">Run</button>
@@ -69,6 +74,17 @@ export class ControlsComponent extends React.Component<IControlsComponentProps, 
       const newState = {
         ...previousState,
         functionUrl
+      };
+      return newState;
+    });
+  }
+
+  private _handleApiKeyChanged = (event: React.FormEvent<HTMLInputElement>) => {
+    const apiKey = event.currentTarget.value;
+    this.setState((previousState) => {
+      const newState = {
+        ...previousState,
+        apiKey
       };
       return newState;
     });

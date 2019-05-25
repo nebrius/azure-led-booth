@@ -107,6 +107,9 @@ async function processBasicAnimation(entry: IBasicQueueEntry) {
 async function processCustomAnimation(entry: ICustomQueueEntry) {
   const response = await fetch(entry.submission.functionUrl, {
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify({
       apiKey: entry.submission.apiKey
     })

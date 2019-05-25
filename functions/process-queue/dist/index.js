@@ -87,6 +87,9 @@ async function processBasicAnimation(entry) {
 async function processCustomAnimation(entry) {
     const response = await node_fetch_1.default(entry.submission.functionUrl, {
         method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
             apiKey: entry.submission.apiKey
         })

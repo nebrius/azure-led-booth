@@ -34,7 +34,13 @@ const submitSimulationTrigger = async (context, req) => {
         return;
     }
     const response = await node_fetch_1.default(message.functionUrl, {
-        method: 'POST'
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            apiKey: message.apiKey
+        })
     });
     const responseMessage = await response.json();
     if (!revalidator_1.validate(responseMessage, common_1.customSubmissionResponseSchema).valid) {
