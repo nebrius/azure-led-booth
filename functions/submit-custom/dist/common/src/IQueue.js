@@ -25,7 +25,7 @@ SOFTWARE.
 Object.defineProperty(exports, "__esModule", { value: true });
 var QueueType;
 (function (QueueType) {
-    QueueType[QueueType["Custom"] = 0] = "Custom";
-    QueueType[QueueType["Basic"] = 1] = "Basic";
+    QueueType["Custom"] = "Custom";
+    QueueType["Basic"] = "Basic";
 })(QueueType = exports.QueueType || (exports.QueueType = {}));
 //# sourceMappingURL=IQueue.js.map

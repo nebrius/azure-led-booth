@@ -1,1 +1,1 @@
-{"version":3,"file":"IQueue.js","sourceRoot":"","sources":["../../../src/common/src/IQueue.ts"],"names":[],"mappings":";AAAA;;;;;;;;;;;;;;;;;;;;;;EAsBE;;AAKF,IAAY,SAGX;AAHD,WAAY,SAAS;IACnB,6CAAM,CAAA;IACN,2CAAK,CAAA;AACP,CAAC,EAHW,SAAS,GAAT,iBAAS,KAAT,iBAAS,QAGpB"}
+{"version":3,"file":"IQueue.js","sourceRoot":"","sources":["../../../src/common/src/IQueue.ts"],"names":[],"mappings":";AAAA;;;;;;;;;;;;;;;;;;;;;;EAsBE;;AAKF,IAAY,SAGX;AAHD,WAAY,SAAS;IACnB,8BAAiB,CAAA;IACjB,4BAAe,CAAA;AACjB,CAAC,EAHW,SAAS,GAAT,iBAAS,KAAT,iBAAS,QAGpB"}

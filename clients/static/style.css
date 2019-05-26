@@ -101,6 +101,11 @@ SOFTWARE.
   padding: 10px;
 }
 
+.queue-entry-type {
+  margin-left: 10px;
+  color: #888;
+}
+
 .submission-form {
   display: grid;
   grid-template-columns: max-content auto;

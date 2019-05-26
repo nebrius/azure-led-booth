@@ -26,8 +26,8 @@ import { IBasicSubmission } from './IBasicSubmission';
 import { ICustomSubmission } from './ICustomSubmission';
 
 export enum QueueType {
-  Custom,
-  Basic
+  Custom = 'Custom',
+  Basic = 'Basic'
 }
 
 export interface IQueueEntry {

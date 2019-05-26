@@ -35,7 +35,8 @@ export function QueueComponent(): JSX.Element {
         {queue.length ?
           queue.map((queueEntry, key) => (
             <div className="queue-entry" key={key}>
-              {key + 1}. {queueEntry.submission.displayName}
+              <span className="queue-entry-info">{key + 1}. {queueEntry.submission.displayName}</span>
+              <span className="queue-entry-type">({queueEntry.type} submission)</span>
             </div>
           )) :
           'Queue is empty.'
