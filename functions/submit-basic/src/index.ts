@@ -33,7 +33,7 @@ import {
   IBasicSubmission,
   StatType
 } from './common/common';
-import { sendErrorResponse, submitStat } from './util/util';
+import { sendResponse } from './util/util';
 
 const AZURE_STORAGE_QUEUE_NAME = getEnvironmentVariable('AZURE_STORAGE_QUEUE_NAME');
 const AZURE_STORAGE_CONNECTION_STRING = getEnvironmentVariable('AZURE_STORAGE_CONNECTION_STRING');
@@ -42,14 +42,14 @@ const submitBasicTrigger: AzureFunction = (context: Context, req: HttpRequest): 
 
   const message: IBasicSubmission = req.body;
   if (!validate(message, basicSubmissionSchema).valid) {
-    sendErrorResponse(400, 'Invalid submission', context, StatType.Basic);
+    sendResponse(400, { error: 'Invalid submission' }, context, StatType.Basic);
     return;
   }
 
   const queueService = createQueueService(AZURE_STORAGE_CONNECTION_STRING);
   queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, (createErr, createResult, createResponse) => {
     if (createErr) {
-      sendErrorResponse(500, 'Could not get queue', context, StatType.Basic);
+      sendResponse(500, { error: 'Could not get queue' }, context, StatType.Basic);
       return;
     }
     const entry: IBasicQueueEntry = {
@@ -58,15 +58,10 @@ const submitBasicTrigger: AzureFunction = (context: Context, req: HttpRequest): 
     };
     queueService.createMessage(AZURE_STORAGE_QUEUE_NAME, JSON.stringify(entry), (addErr) => {
       if (addErr) {
-        sendErrorResponse(500, 'Could not add message to queue', context, StatType.Basic);
-        return;
+        sendResponse(500, { error: 'Could not add message to queue' }, context, StatType.Basic);
+      } else {
+        sendResponse(200, { status: 'ok' }, context, StatType.Basic);
       }
-      submitStat({ statusCode: 200, type: StatType.Basic }, context, () => {
-        context.res = {
-          body: JSON.stringify({ status: 'ok' })
-        };
-        context.done();
-      });
     });
   });
 };

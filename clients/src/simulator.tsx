@@ -35,7 +35,7 @@ const NUM_WAVES = 4;
 
 const startTime = Date.now();
 let waveParameters: IWaveParameters = createWaveParameters(
-  createMovingWave(0, 255, 8, 16),
+  createMovingWave(0, 255, 8, 4),
   createSolidColorWave(128, 255, 255, 255)
 );
 
@@ -67,6 +67,7 @@ init().then((calculatePixelValue) => {
       const pixelColorLayers: IColor[] = [];
 
       for (let j = 0; j < NUM_WAVES; j++) {
+        const x = Math.floor(255 * (i % waveParameters.distancePeriod) / waveParameters.distancePeriod);
         const pixelColor = hsv.rgb([
           Math.round(calculatePixelValue(
             waveParameters.waves[j].h.a,
@@ -75,7 +76,7 @@ init().then((calculatePixelValue) => {
             waveParameters.waves[j].h.phi,
             waveParameters.waves[j].h.b,
             t,
-            i) * 360 / 255),
+            x) * 360 / 255),
           Math.round(calculatePixelValue(
             waveParameters.waves[j].s.a,
             waveParameters.waves[j].s.w_t,
@@ -83,7 +84,7 @@ init().then((calculatePixelValue) => {
             waveParameters.waves[j].s.phi,
             waveParameters.waves[j].s.b,
             t,
-            i) * 100 / 255),
+            x) * 100 / 255),
           Math.round(calculatePixelValue(
             waveParameters.waves[j].v.a,
             waveParameters.waves[j].v.w_t,
@@ -91,7 +92,7 @@ init().then((calculatePixelValue) => {
             waveParameters.waves[j].v.phi,
             waveParameters.waves[j].v.b,
             t,
-            i) * 100 / 255)
+            x) * 100 / 255)
         ]);
         pixelColorLayers[j] = {
           r: pixelColor[0],
@@ -104,7 +105,7 @@ init().then((calculatePixelValue) => {
             waveParameters.waves[j].a.phi,
             waveParameters.waves[j].a.b,
             t,
-            i)
+            x)
         };
       }
       colors[i] = pixelColorLayers;

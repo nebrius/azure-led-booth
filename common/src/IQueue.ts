@@ -41,6 +41,5 @@ export interface IBasicQueueEntry extends IQueueEntry {
 
 export interface ICustomQueueEntry extends IQueueEntry {
   type: QueueType.Custom;
-  userId: string;
   submission: ICustomSubmission;
 }

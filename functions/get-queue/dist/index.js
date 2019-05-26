@@ -32,28 +32,25 @@ const getQueueTrigger = (context, req) => {
     const queueService = azure_storage_1.createQueueService(AZURE_STORAGE_CONNECTION_STRING);
     queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, (createErr, createResult, createResponse) => {
         if (createErr) {
-            util_1.sendErrorResponse(500, 'Could not get queue', context);
+            util_1.sendResponse(500, { error: 'Could not get queue' }, context);
             return;
         }
         queueService.peekMessages(AZURE_STORAGE_QUEUE_NAME, {
             numOfMessages: 32,
         }, (peekErr, peekResult, peekResponse) => {
             if (peekErr) {
-                util_1.sendErrorResponse(500, 'Could not peek messages in queue', context);
+                util_1.sendResponse(500, { error: 'Could not peek messages in queue' }, context);
                 return;
             }
             const animations = [];
             for (const message of peekResult) {
                 if (!message.messageText) {
-                    util_1.sendErrorResponse(500, `Message with ID ${message.messageId} did not have a message body`, context);
+                    util_1.sendResponse(500, { error: `Message with ID ${message.messageId} did not have a message body` }, context);
                     return;
                 }
                 animations.push(JSON.parse(message.messageText));
             }
-            context.res = {
-                body: JSON.stringify(animations)
-            };
-            context.done();
+            util_1.sendResponse(200, animations, context);
         });
     });
 };

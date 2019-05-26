@@ -27,8 +27,3 @@ export enum StatType {
   Custom = 'custom',
   Simulation = 'simulation'
 }
-
-export interface IStat {
-  type: StatType;
-  statusCode: number;
-}

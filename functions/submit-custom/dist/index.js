@@ -32,31 +32,26 @@ const AZURE_STORAGE_CONNECTION_STRING = common_1.getEnvironmentVariable('AZURE_S
 const submitCustomTrigger = (context, req) => {
     const message = req.body;
     if (!revalidator_1.validate(message, common_1.customSubmissionSchema).valid) {
-        util_1.sendErrorResponse(400, 'Invalid submission', context, common_1.StatType.Custom);
+        util_1.sendResponse(400, { error: 'Invalid submission' }, context, common_1.StatType.Custom);
         return;
     }
     const queueService = azure_storage_1.createQueueService(AZURE_STORAGE_CONNECTION_STRING);
     queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, (createErr, createResult, createResponse) => {
         if (createErr) {
-            util_1.sendErrorResponse(500, 'Could not get queue', context, common_1.StatType.Custom);
+            util_1.sendResponse(500, { error: 'Could not get queue' }, context, common_1.StatType.Custom);
             return;
         }
         const entry = {
             type: common_1.QueueType.Custom,
-            userId: '',
             submission: message
         };
         queueService.createMessage(AZURE_STORAGE_QUEUE_NAME, JSON.stringify(entry), (addErr, addResult, addResponse) => {
             if (addErr) {
-                util_1.sendErrorResponse(500, 'Could not add message to queue', context, common_1.StatType.Custom);
-                return;
+                util_1.sendResponse(500, { error: 'Could not add message to queue' }, context, common_1.StatType.Custom);
             }
-            util_1.submitStat({ statusCode: 200, type: common_1.StatType.Custom }, context, () => {
-                context.res = {
-                    body: JSON.stringify({ status: 'ok' })
-                };
-                context.done();
-            });
+            else {
+                util_1.sendResponse(200, { status: 'ok' }, context, common_1.StatType.Custom);
+            }
         });
     });
 };

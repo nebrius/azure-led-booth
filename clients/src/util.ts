@@ -37,8 +37,12 @@ export async function api(endpoint: string, method: 'GET' | 'POST', body?: any) 
     };
     options.body = JSON.stringify(body);
   }
-  const response = await fetch(API_ENDPOINT + endpoint, options);
-  return await response.json();
+  try {
+    const response = await fetch(API_ENDPOINT + endpoint, options);
+    return await response.json();
+  } catch (e) {
+    throw e;
+  }
 }
 
 let queue: Array<IBasicQueueEntry | ICustomQueueEntry> = [];

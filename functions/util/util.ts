@@ -24,37 +24,40 @@ SOFTWARE.
 
 import { Context } from '@azure/functions';
 import { createTableService, TableUtilities } from 'azure-storage';
-import { getEnvironmentVariable, IStat, StatType } from '../common/common';
+import { getEnvironmentVariable, StatType } from '../common/common';
 import { v4 } from 'uuid';
 
 const AZURE_STORAGE_TABLE_NAME = getEnvironmentVariable('AZURE_STORAGE_TABLE_NAME');
 
-export function sendErrorResponse(status: number, body: string, context: Context, statType?: StatType, ): void {
-  context.res = { status, body };
-  if (statType) {
-    submitStat({ statusCode: status, type: statType }, context, () => context.done());
-  }
+interface IBody {
+  [ key: string]: any;
 }
 
-export function submitStat(stat: IStat, context: Context, cb: () => void): void {
-  const tableService = createTableService();
-  tableService.createTableIfNotExists(AZURE_STORAGE_TABLE_NAME, (createErr) => {
-    if (createErr) {
-      context.log(`Could not get stats table: ${createErr}`);
-      cb();
-      return;
-    }
-    const entity = {
-      PartitionKey: TableUtilities.entityGenerator.String(AZURE_STORAGE_TABLE_NAME),
-      RowKey: TableUtilities.entityGenerator.String(v4()),
-      type: TableUtilities.entityGenerator.String(stat.type),
-      statusCode: TableUtilities.entityGenerator.Int32(stat.statusCode)
-    };
-    tableService.insertEntity(AZURE_STORAGE_TABLE_NAME, entity, (insertErr) => {
-      if (insertErr) {
-        context.log(`Could not insert stats entity: ${insertErr}`);
-      }
-      cb();
+export async function sendResponse(status: number, body: IBody, context: Context, statType?: StatType) {
+  context.res = { status, body };
+  if (statType) {
+    await new Promise((resolve, reject) => {
+      const tableService = createTableService();
+      tableService.createTableIfNotExists(AZURE_STORAGE_TABLE_NAME, (createErr) => {
+        if (createErr) {
+          context.log(`Could not get stats table: ${createErr}`);
+          reject();
+          return;
+        }
+        const entity = {
+          PartitionKey: TableUtilities.entityGenerator.String(AZURE_STORAGE_TABLE_NAME),
+          RowKey: TableUtilities.entityGenerator.String(v4()),
+          type: TableUtilities.entityGenerator.String(statType),
+          statusCode: TableUtilities.entityGenerator.Int32(status)
+        };
+        tableService.insertEntity(AZURE_STORAGE_TABLE_NAME, entity, (insertErr) => {
+          if (insertErr) {
+            context.log(`Could not insert stats entity: ${insertErr}`);
+          }
+          resolve();
+        });
+      });
     });
-  });
+  }
+  context.done();
 }

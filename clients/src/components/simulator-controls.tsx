@@ -92,7 +92,11 @@ export class ControlsComponent extends React.Component<IControlsComponentProps, 
 
   private _handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const waveParameters = await api('submit-simulation', 'POST', this.state);
-    this.props.onWaveParametersUpdated(waveParameters);
+    try {
+      const waveParameters = await api('submit-simulation', 'POST', this.state);
+      this.props.onWaveParametersUpdated(waveParameters);
+    } catch (e) {
+      console.error(e);
+    }
   }
 }
