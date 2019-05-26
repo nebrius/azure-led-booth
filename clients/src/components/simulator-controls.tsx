@@ -143,11 +143,11 @@ export class ControlsComponent extends React.Component<IControlsComponentProps, 
     event.preventDefault();
     this._setSaveState(State.saving);
     try {
-      const waveParameters = await api('submit-simulation', 'POST', this.state);
+      const waveParameters = await api('submit-simulation', 'POST', this.state.submission);
       this.props.onWaveParametersUpdated(waveParameters);
       this._setSaveState(State.success);
     } catch (e) {
-      this._setSaveState(State.error, e.error);
+      this._setSaveState(State.error, e.message);
     }
   }
 }

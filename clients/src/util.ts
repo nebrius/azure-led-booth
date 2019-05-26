@@ -41,13 +41,13 @@ export async function api(endpoint: string, method: 'GET' | 'POST', body?: any) 
     const response = await fetch(API_ENDPOINT + endpoint, options);
     const responseBody = await response.json();
     if (response.status === 400) {
-      throw responseBody;
+      throw new Error(responseBody.error);
     } else if (response.status > 400) {
-      throw { error: 'Error communicating with server' };
+      throw new Error('Error communicating with server');
     }
     return responseBody;
   } catch (e) {
-    throw { error: e.message };
+    throw e;
   }
 }
 

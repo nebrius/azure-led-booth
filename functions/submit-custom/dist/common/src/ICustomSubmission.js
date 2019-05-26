@@ -35,6 +35,10 @@ exports.customSubmissionSchema = {
             type: 'string',
             required: true
         },
+        apiKey: {
+            type: 'string',
+            required: false
+        }
     }
 };
 // Force to "any" type, otherwise TypeScript thinks the type is too strict and won't ever compile

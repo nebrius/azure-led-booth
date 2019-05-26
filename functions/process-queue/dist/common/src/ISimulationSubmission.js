@@ -30,6 +30,10 @@ exports.simulationSubmissionSchema = {
             type: 'string',
             pattern: '^https\:\/\/[a-zA-Z0-9\-]*?\.azurewebsites\.net\/.*$',
             required: true
+        },
+        apiKey: {
+            type: 'string',
+            required: false
         }
     }
 };

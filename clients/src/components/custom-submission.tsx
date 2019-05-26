@@ -158,10 +158,10 @@ export class SubmissionComponent extends React.Component<{}, ISubmissionComponen
     event.preventDefault();
     this._setSaveState(State.saving);
     try {
-      await api('submit-custom', 'POST', this.state);
+      await api('submit-custom', 'POST', this.state.submission);
       this._setSaveState(State.success);
     } catch (e) {
-      this._setSaveState(State.error, e.error);
+      this._setSaveState(State.error, e.message);
     }
     updateQueue();
   }

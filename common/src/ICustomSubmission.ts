@@ -48,6 +48,10 @@ export const customSubmissionSchema: any = {
       type: 'string',
       required: true
     },
+    apiKey: {
+      type: 'string',
+      required: false
+    }
   }
 };
 
