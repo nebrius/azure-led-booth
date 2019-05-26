@@ -48,6 +48,36 @@ SOFTWARE.
   justify-content: center;
 }
 
+.banner-error, .banner-success, .banner-saving {
+  padding: 5px;
+  text-align: center;
+  border-radius: 2px;
+}
+
+.banner-error {
+  background-color: hsl(0, 70%, 90%);
+}
+
+.banner-success {
+  background-color: hsl(120, 70%, 90%);
+}
+
+.banner-saving {
+  background-color: hsl(240, 70%, 90%);
+}
+
+.simulator-banner {
+  margin-top: 20px;
+}
+
+.basic-banner {
+  margin-bottom: 20px;
+}
+
+.custom-banner {
+  margin-bottom: 20px;
+}
+
 .submission {
   padding: 10px;
   grid-area: submission;

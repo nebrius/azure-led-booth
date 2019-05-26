@@ -26,17 +26,35 @@ import * as React from 'react';
 import { api } from '../util';
 import { IWaveParameters } from 'rvl-node-types';
 import { ISimulationSubmission } from '../common/common';
+import { reduce } from 'conditional-reduce';
 
 interface IControlsComponentProps {
   onWaveParametersUpdated: (waveParamters: IWaveParameters) => void;
   waveParameters: IWaveParameters;
 }
 
-export class ControlsComponent extends React.Component<IControlsComponentProps, ISimulationSubmission> {
+enum State {
+  none = 'none',
+  saving = 'saving',
+  success = 'success',
+  error = 'error'
+}
+
+interface IControlsComponentState {
+  submission: ISimulationSubmission;
+  state: State;
+  stateError?: string;
+}
+
+export class ControlsComponent extends React.Component<IControlsComponentProps, IControlsComponentState> {
 
   public state = {
-    functionUrl: '',
-    apiKey: ''
+    submission: {
+      functionUrl: '',
+      apiKey: ''
+    },
+    state: State.none,
+    stateError: ''
   };
 
   public render() {
@@ -48,20 +66,34 @@ export class ControlsComponent extends React.Component<IControlsComponentProps, 
           <input
             type="text"
             id="displayNameInput"
-            value={this.state.functionUrl}
+            value={this.state.submission.functionUrl}
             onChange={this._handleFunctionUrlChanged} />
 
           <label htmlFor="displayNameInput">API Key:</label>
           <input
             type="text"
             id="displayNameInput"
-            value={this.state.apiKey}
+            value={this.state.submission.apiKey}
             onChange={this._handleApiKeyChanged} />
 
           <div>
             <button type="submit">Run</button>
           </div>
         </form>
+        {reduce(this.state.state, {
+          [State.none]: () => (
+            <div></div>
+          ),
+          [State.error]: () => (
+            <div className="banner-error simulator-banner">{this.state.stateError}</div>
+          ),
+          [State.success]: () => (
+            <div className="banner-success simulator-banner">Successfully called your custom Azure Function</div>
+          ),
+          [State.saving]: () => (
+            <div className="banner-saving simulator-banner">Calling your custom Azure Function...</div>
+          )
+        })}
         <h3>Your Wave Parameters</h3>
         <pre className="controls-parameters">{JSON.stringify(this.props.waveParameters, null, '  ')}</pre>
       </div>
@@ -73,7 +105,10 @@ export class ControlsComponent extends React.Component<IControlsComponentProps, 
     this.setState((previousState) => {
       const newState = {
         ...previousState,
-        functionUrl
+        submission: {
+          ...previousState.submission,
+          functionUrl
+        }
       };
       return newState;
     });
@@ -84,7 +119,21 @@ export class ControlsComponent extends React.Component<IControlsComponentProps, 
     this.setState((previousState) => {
       const newState = {
         ...previousState,
-        apiKey
+        submission: {
+          ...previousState.submission,
+          apiKey
+        }
+      };
+      return newState;
+    });
+  }
+
+  private _setSaveState = (state: State, stateError?: string) => {
+    this.setState((previousState) => {
+      const newState = {
+        ...previousState,
+        state,
+        stateError
       };
       return newState;
     });
@@ -92,11 +141,13 @@ export class ControlsComponent extends React.Component<IControlsComponentProps, 
 
   private _handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    this._setSaveState(State.saving);
     try {
       const waveParameters = await api('submit-simulation', 'POST', this.state);
       this.props.onWaveParametersUpdated(waveParameters);
+      this._setSaveState(State.success);
     } catch (e) {
-      console.error(e);
+      this._setSaveState(State.error, e.error);
     }
   }
 }

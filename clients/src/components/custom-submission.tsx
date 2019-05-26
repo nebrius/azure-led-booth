@@ -26,39 +26,71 @@ import * as React from 'react';
 import { ICustomSubmission } from '../common/common';
 import { api, updateQueue } from '../util';
 import * as uuidv4 from 'uuid/v4';
+import { reduce } from 'conditional-reduce';
 
-export class SubmissionComponent extends React.Component<{}, ICustomSubmission> {
+enum State {
+  none = 'none',
+  saving = 'saving',
+  success = 'success',
+  error = 'error'
+}
+
+interface ISubmissionComponentState {
+  submission: ICustomSubmission;
+  state: State;
+  stateError?: string;
+}
+
+export class SubmissionComponent extends React.Component<{}, ISubmissionComponentState> {
 
   public state = {
-    functionUrl: '',
-    apiKey: uuidv4(),
-    displayName: ''
+    submission: {
+      functionUrl: '',
+      apiKey: uuidv4(),
+      displayName: ''
+    },
+    state: State.none,
+    stateError: ''
   };
 
   public render() {
     return (
       <div className="submission">
         <div className="submission-header"><h2>New Submission</h2></div>
+        {reduce(this.state.state, {
+          [State.none]: () => (
+            <div></div>
+          ),
+          [State.error]: () => (
+            <div className="banner-error basic-banner">{this.state.stateError}</div>
+          ),
+          [State.success]: () => (
+            <div className="banner-success basic-banner">Your submission has been queued up!</div>
+          ),
+          [State.saving]: () => (
+            <div className="banner-saving basic-banner">Submitting your submission...</div>
+          )
+        })}
         <form className="submission-form" onSubmit={this._handleSubmit}>
           <label htmlFor="displayNameInput">Azure Function Endpoint:</label>
           <input
             type="text"
             id="displayNameInput"
-            value={this.state.functionUrl}
+            value={this.state.submission.functionUrl}
             onChange={this._handleFunctionUrlChanged} />
 
           <label htmlFor="apiKeyInput">API Key:</label>
           <input
             type="text"
             id="apiKeyInputInput"
-            value={this.state.apiKey}
+            value={this.state.submission.apiKey}
             onChange={this._handleApiKeyChanged} />
 
           <label htmlFor="displayNameInput">Display Name:</label>
           <input
             type="text"
             id="displayNameInput"
-            value={this.state.displayName}
+            value={this.state.submission.displayName}
             onChange={this._handleDisplayNameChanged} />
 
           <div>
@@ -74,7 +106,10 @@ export class SubmissionComponent extends React.Component<{}, ICustomSubmission> 
     this.setState((previousState) => {
       const newState = {
         ...previousState,
-        functionUrl
+        submission: {
+          ...previousState.submission,
+          functionUrl
+        }
       };
       return newState;
     });
@@ -85,7 +120,10 @@ export class SubmissionComponent extends React.Component<{}, ICustomSubmission> 
     this.setState((previousState) => {
       const newState = {
         ...previousState,
-        apiKey
+        submission: {
+          ...previousState.submission,
+          apiKey
+        }
       };
       return newState;
     });
@@ -96,7 +134,21 @@ export class SubmissionComponent extends React.Component<{}, ICustomSubmission> 
     this.setState((previousState) => {
       const newState = {
         ...previousState,
-        displayName
+        submission: {
+          ...previousState.submission,
+          displayName
+        }
+      };
+      return newState;
+    });
+  }
+
+  private _setSaveState = (state: State, stateError?: string) => {
+    this.setState((previousState) => {
+      const newState = {
+        ...previousState,
+        state,
+        stateError
       };
       return newState;
     });
@@ -104,7 +156,13 @@ export class SubmissionComponent extends React.Component<{}, ICustomSubmission> 
 
   private _handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    await api('submit-custom', 'POST', this.state);
+    this._setSaveState(State.saving);
+    try {
+      await api('submit-custom', 'POST', this.state);
+      this._setSaveState(State.success);
+    } catch (e) {
+      this._setSaveState(State.error, e.error);
+    }
     updateQueue();
   }
 }

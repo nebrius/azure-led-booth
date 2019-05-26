@@ -39,9 +39,15 @@ export async function api(endpoint: string, method: 'GET' | 'POST', body?: any) 
   }
   try {
     const response = await fetch(API_ENDPOINT + endpoint, options);
-    return await response.json();
+    const responseBody = await response.json();
+    if (response.status === 400) {
+      throw responseBody;
+    } else if (response.status > 400) {
+      throw { error: 'Error communicating with server' };
+    }
+    return responseBody;
   } catch (e) {
-    throw e;
+    throw { error: e.message };
   }
 }
 
