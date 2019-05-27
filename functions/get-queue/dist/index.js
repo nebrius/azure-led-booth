@@ -29,12 +29,15 @@ const util_1 = require("./util/util");
 const AZURE_STORAGE_QUEUE_NAME = common_1.getEnvironmentVariable('AZURE_STORAGE_QUEUE_NAME');
 const AZURE_STORAGE_CONNECTION_STRING = common_1.getEnvironmentVariable('AZURE_STORAGE_CONNECTION_STRING');
 const getQueueTrigger = (context, req) => {
+    context.log('[GetQueueTrigger]: Processing request');
+    context.log('[GetQueueTrigger]: Fetching or creating queue');
     const queueService = azure_storage_1.createQueueService(AZURE_STORAGE_CONNECTION_STRING);
     queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, (createErr, createResult, createResponse) => {
         if (createErr) {
             util_1.sendResponse(500, { error: 'Could not get queue' }, context);
             return;
         }
+        context.log('[GetQueueTrigger]: Peaking queue');
         queueService.peekMessages(AZURE_STORAGE_QUEUE_NAME, {
             numOfMessages: 32,
         }, (peekErr, peekResult, peekResponse) => {

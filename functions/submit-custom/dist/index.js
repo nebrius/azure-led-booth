@@ -30,11 +30,13 @@ const util_1 = require("./util/util");
 const AZURE_STORAGE_QUEUE_NAME = common_1.getEnvironmentVariable('AZURE_STORAGE_QUEUE_NAME');
 const AZURE_STORAGE_CONNECTION_STRING = common_1.getEnvironmentVariable('AZURE_STORAGE_CONNECTION_STRING');
 const submitCustomTrigger = (context, req) => {
+    context.log('[CustomTrigger]: Processing submission');
     const message = req.body;
     if (!revalidator_1.validate(message, common_1.customSubmissionSchema).valid) {
         util_1.sendResponse(400, { error: 'Invalid submission' }, context, common_1.StatType.Custom);
         return;
     }
+    context.log('[CustomTrigger]: Fetching or creating queue');
     const queueService = azure_storage_1.createQueueService(AZURE_STORAGE_CONNECTION_STRING);
     queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, (createErr, createResult, createResponse) => {
         if (createErr) {
@@ -45,6 +47,7 @@ const submitCustomTrigger = (context, req) => {
             type: common_1.QueueType.Custom,
             submission: message
         };
+        context.log('[CustomTrigger]: Adding queue entry');
         queueService.createMessage(AZURE_STORAGE_QUEUE_NAME, JSON.stringify(entry), (addErr, addResult, addResponse) => {
             if (addErr) {
                 util_1.sendResponse(500, { error: 'Could not add message to queue' }, context, common_1.StatType.Custom);

@@ -31,12 +31,16 @@ const AZURE_STORAGE_QUEUE_NAME = getEnvironmentVariable('AZURE_STORAGE_QUEUE_NAM
 const AZURE_STORAGE_CONNECTION_STRING = getEnvironmentVariable('AZURE_STORAGE_CONNECTION_STRING');
 
 const getQueueTrigger: AzureFunction = (context: Context, req: HttpRequest): void => {
+  context.log('[GetQueueTrigger]: Processing request');
+
+  context.log('[GetQueueTrigger]: Fetching or creating queue');
   const queueService = createQueueService(AZURE_STORAGE_CONNECTION_STRING);
   queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, (createErr, createResult, createResponse) => {
     if (createErr) {
       sendResponse(500, { error: 'Could not get queue' }, context);
       return;
     }
+    context.log('[GetQueueTrigger]: Peaking queue');
     queueService.peekMessages(AZURE_STORAGE_QUEUE_NAME, {
       numOfMessages: 32,
     }, (peekErr, peekResult, peekResponse) => {

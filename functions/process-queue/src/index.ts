@@ -137,10 +137,10 @@ async function processDefaultAnimation() {
 
 const prcoessQueueTrigger: AzureFunction = (context: Context, timer: ITimerRequest): void => {
   const queueService = createQueueService(AZURE_STORAGE_CONNECTION_STRING);
-  context.log('Fetching or creating queue');
+  context.log('[ProcessQueueTrigger]: Fetching or creating queue');
   queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, (createErr, createResult, createResponse) => {
     if (createErr) {
-      context.log(`Could not get queue, bailing: ${createErr}`);
+      context.log(`[ProcessQueueTrigger]: Could not get queue, bailing: ${createErr}`);
       context.done();
       return;
     }
@@ -148,33 +148,35 @@ const prcoessQueueTrigger: AzureFunction = (context: Context, timer: ITimerReque
     // Ignore past due timers, because we don't want a rapid succession of animations
     // Better to take too long than too short here.
     if (timer.IsPastDue) {
-      context.log('Timer is past due, skipping this round until the timer infrastructure catches up');
+      context.log(
+        '[ProcessQueueTrigger]: Timer is past due, skipping this round until the timer infrastructure catches up');
       context.done();
       return;
     }
 
     function processMessage(): void {
-      context.log('Getting the next message from the queue');
+      context.log('[ProcessQueueTrigger]: Getting the next message from the queue');
       // Dequeue the message from the queue, but leave it there. We'll delete it later once we're done processing it.
       // This approach allows us to leave it in the queue but mark it so no one else can process it.
       queueService.getMessage(AZURE_STORAGE_QUEUE_NAME, (getErr, message) => {
         // This means there was an error getting the messages, and we should report it as an error
         if (getErr) {
-          context.log(`Could not get message, bailing: ${getErr}`);
+          context.log(`[ProcessQueueTrigger]: Could not get message, bailing: ${getErr}`);
           context.done();
           return;
         }
 
         // This means there are no messages to get, so let's show the default animation
         if (!message) {
-          context.log('No messages in queue, running default animation');
+          context.log('[ProcessQueueTrigger]: No messages in queue, running default animation');
           processDefaultAnimation()
             .then(() => {
-              context.log('Default animation sent to the device');
+              context.log('[ProcessQueueTrigger]: Default animation sent to the device');
               context.done();
             })
             .catch((err: Error) => {
-              context.log(`Could not process default animation, skipping animation: ${err.message}`);
+              context.log(
+                `[ProcessQueueTrigger]: Could not process default animation, skipping animation: ${err.message}`);
             });
           return;
         }
@@ -197,7 +199,7 @@ const prcoessQueueTrigger: AzureFunction = (context: Context, timer: ITimerReque
           // Now that we're done processing, let's remove it from the queue
           queueService.deleteMessage(AZURE_STORAGE_QUEUE_NAME, messageId as string, popReceipt as string, (err) => {
             if (err) {
-              context.log(`Could not delete message, bailing: ${err}`);
+              context.log(`[ProcessQueueTrigger]: Could not delete message, bailing: ${err}`);
               context.done();
               return;
             }
@@ -209,39 +211,41 @@ const prcoessQueueTrigger: AzureFunction = (context: Context, timer: ITimerReque
         try {
           entry = JSON.parse(messageText);
         } catch (e) {
-          context.log(`Error: could not parse message, skipping animation: ${e}`);
+          context.log(`[ProcessQueueTrigger]: Error: could not parse message, skipping animation: ${e}`);
           finalize(processMessage);
           return;
         }
         switch (entry.type) {
           case QueueType.Basic: {
-            context.log('Processing basic animation');
+            context.log('[ProcessQueueTrigger]: Processing basic animation');
             processBasicAnimation(entry as IBasicQueueEntry)
               .then(() => {
-                context.log('Basic animation sent to the device');
+                context.log('[ProcessQueueTrigger]: Basic animation sent to the device');
                 finalize(() => context.done());
               })
               .catch((err: Error) => {
-                context.log(`Could not process basic animation, skipping animation: ${err.message}`);
+                context.log(
+                  `[ProcessQueueTrigger]: Could not process basic animation, skipping animation: ${err.message}`);
                 finalize(processMessage);
               });
             break;
           }
           case QueueType.Custom: {
-            context.log('Processing custom animation');
+            context.log('[ProcessQueueTrigger]: Processing custom animation');
             processCustomAnimation(entry as ICustomQueueEntry)
               .then(() => {
-                context.log('Custom animation sent to the device');
+                context.log('[ProcessQueueTrigger]: Custom animation sent to the device');
                 finalize(() => context.done());
               })
               .catch((err: Error) => {
-                context.log(`Could not process custom animation, skipping animation: ${err.message}`);
+                context.log(
+                  `[ProcessQueueTrigger]: Could not process custom animation, skipping animation: ${err.message}`);
                 finalize(processMessage);
               });
             break;
           }
           default: {
-            context.log(`Error: invalid animation queue type ${entry.type}, skipping animation`);
+            context.log(`[ProcessQueueTrigger]: Error: invalid animation queue type ${entry.type}, skipping animation`);
             finalize(processMessage);
           }
         }

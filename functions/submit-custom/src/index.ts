@@ -39,6 +39,7 @@ const AZURE_STORAGE_QUEUE_NAME = getEnvironmentVariable('AZURE_STORAGE_QUEUE_NAM
 const AZURE_STORAGE_CONNECTION_STRING = getEnvironmentVariable('AZURE_STORAGE_CONNECTION_STRING');
 
 const submitCustomTrigger: AzureFunction = (context: Context, req: HttpRequest): void => {
+  context.log('[CustomTrigger]: Processing submission');
 
   const message: ICustomSubmission = req.body;
   if (!validate(message, customSubmissionSchema).valid) {
@@ -46,6 +47,7 @@ const submitCustomTrigger: AzureFunction = (context: Context, req: HttpRequest):
     return;
   }
 
+  context.log('[CustomTrigger]: Fetching or creating queue');
   const queueService = createQueueService(AZURE_STORAGE_CONNECTION_STRING);
   queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, (createErr, createResult, createResponse) => {
     if (createErr) {
@@ -56,6 +58,7 @@ const submitCustomTrigger: AzureFunction = (context: Context, req: HttpRequest):
       type: QueueType.Custom,
       submission: message
     };
+    context.log('[CustomTrigger]: Adding queue entry');
     queueService.createMessage(AZURE_STORAGE_QUEUE_NAME, JSON.stringify(entry), (addErr, addResult, addResponse) => {
       if (addErr) {
         sendResponse(500, { error: 'Could not add message to queue' }, context, StatType.Custom);

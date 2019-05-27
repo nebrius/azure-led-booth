@@ -35,11 +35,15 @@ import {
 import fetch, { Response } from 'node-fetch';
 
 const submitSimulationTrigger: AzureFunction = async (context: Context, req: HttpRequest) => {
+  context.log('[SimulationTrigger]: Processing submission');
+
   const message: ISimulationSubmission = req.body;
   if (!validate(message, simulationSubmissionSchema).valid) {
-    sendResponse(400, { error: 'Invalid submission' }, context, StatType.Simulation);
+    await sendResponse(400, { error: 'Invalid submission' }, context, StatType.Simulation);
     return;
   }
+
+  context.log('[SimulationTrigger]: Calling user Function');
   let response: Response;
   try {
     response = await fetch(message.functionUrl, {
@@ -52,38 +56,42 @@ const submitSimulationTrigger: AzureFunction = async (context: Context, req: Htt
       })
     });
   } catch (e) {
-    sendResponse(
+    await sendResponse(
       400,
       { error: `Could not call your Function: ${e}` },
       context,
       StatType.Simulation);
     return;
   }
+
   if (response.status !== 200) {
     const responseText = await response.text();
-    sendResponse(
+    await sendResponse(
       400,
       { error: `Your Function returned a ${response.status} status code with response text "${responseText}"` },
       context,
       StatType.Simulation);
     return;
   }
+
+  context.log('[SimulationTrigger]: Processing respones from user Function');
   let responseMessage: ICustomSubmissionResponse;
   try {
     responseMessage = await response.json();
   } catch (e) {
-    sendResponse(500, { error: `Could not parse response: ${e}` }, context, StatType.Simulation);
+    await sendResponse(500, { error: `Could not parse response: ${e}` }, context, StatType.Simulation);
     return;
   }
   if (!validate(responseMessage, customSubmissionResponseSchema).valid) {
-    sendResponse(
+    await sendResponse(
       400,
       { error: `Received invalid response from user Function: ${JSON.stringify(message, null, '  ')}` },
       context,
       StatType.Simulation);
     return;
   }
-  sendResponse(200, responseMessage.waveParameters, context, StatType.Simulation);
+
+  await sendResponse(200, responseMessage.waveParameters, context, StatType.Simulation);
 };
 
 export default submitSimulationTrigger;
