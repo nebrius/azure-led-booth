@@ -32,7 +32,7 @@ import {
   customSubmissionResponseSchema,
   StatType
 } from './common/common';
-import fetch from 'node-fetch';
+import fetch, { Response } from 'node-fetch';
 
 const submitSimulationTrigger: AzureFunction = async (context: Context, req: HttpRequest) => {
   const message: ISimulationSubmission = req.body;
@@ -40,16 +40,41 @@ const submitSimulationTrigger: AzureFunction = async (context: Context, req: Htt
     sendResponse(400, { error: 'Invalid submission' }, context, StatType.Simulation);
     return;
   }
-  const response = await fetch(message.functionUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      apiKey: message.apiKey
-    })
-  });
-  const responseMessage: ICustomSubmissionResponse = await response.json();
+  let response: Response;
+  try {
+    response = await fetch(message.functionUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        apiKey: message.apiKey
+      })
+    });
+  } catch (e) {
+    sendResponse(
+      400,
+      { error: `Could not call your Function: ${e.message}` },
+      context,
+      StatType.Simulation);
+    return;
+  }
+  if (response.status !== 200) {
+    const responseText = await response.text();
+    sendResponse(
+      400,
+      { error: `Your Function returned a ${response.status} status code with response text "${responseText}"` },
+      context,
+      StatType.Simulation);
+    return;
+  }
+  let responseMessage: ICustomSubmissionResponse;
+  try {
+    responseMessage = await response.json();
+  } catch (e) {
+    sendResponse(500, { error: `Could not parse response: ${e}` }, context, StatType.Simulation);
+    return;
+  }
   if (!validate(responseMessage, customSubmissionResponseSchema).valid) {
     sendResponse(
       400,

@@ -28,6 +28,7 @@ const common_1 = require("../common/common");
 const uuid_1 = require("uuid");
 const AZURE_STORAGE_TABLE_NAME = common_1.getEnvironmentVariable('AZURE_STORAGE_TABLE_NAME');
 async function sendResponse(status, body, context, statType) {
+    context.log(`Sending ${status} response: ${JSON.stringify(body, null, '  ')}`);
     context.res = { status, body };
     if (statType) {
         await new Promise((resolve, reject) => {

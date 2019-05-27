@@ -33,16 +33,35 @@ const submitSimulationTrigger = async (context, req) => {
         util_1.sendResponse(400, { error: 'Invalid submission' }, context, common_1.StatType.Simulation);
         return;
     }
-    const response = await node_fetch_1.default(message.functionUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            apiKey: message.apiKey
-        })
-    });
-    const responseMessage = await response.json();
+    let response;
+    try {
+        response = await node_fetch_1.default(message.functionUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                apiKey: message.apiKey
+            })
+        });
+    }
+    catch (e) {
+        util_1.sendResponse(400, { error: `Could not call your Function: ${e}` }, context, common_1.StatType.Simulation);
+        return;
+    }
+    if (response.status !== 200) {
+        const responseText = await response.text();
+        util_1.sendResponse(400, { error: `Your Function returned a ${response.status} status code with response text "${responseText}"` }, context, common_1.StatType.Simulation);
+        return;
+    }
+    let responseMessage;
+    try {
+        responseMessage = await response.json();
+    }
+    catch (e) {
+        util_1.sendResponse(500, { error: `Could not parse response: ${e}` }, context, common_1.StatType.Simulation);
+        return;
+    }
     if (!revalidator_1.validate(responseMessage, common_1.customSubmissionResponseSchema).valid) {
         util_1.sendResponse(400, { error: `Received invalid response from user Function: ${JSON.stringify(message, null, '  ')}` }, context, common_1.StatType.Simulation);
         return;

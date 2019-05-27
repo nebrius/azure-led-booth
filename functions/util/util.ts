@@ -34,6 +34,7 @@ interface IBody {
 }
 
 export async function sendResponse(status: number, body: IBody, context: Context, statType?: StatType) {
+  context.log(`Sending ${status} response: ${JSON.stringify(body, null, '  ')}`);
   context.res = { status, body };
   if (statType) {
     await new Promise((resolve, reject) => {
