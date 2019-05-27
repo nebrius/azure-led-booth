@@ -73,7 +73,7 @@ sudo systemctl enable raver-lights
 Now the service won't _quite_ work yet, because it's expecting some environment variables to be set. We're going to do this by creating a service override. Run:
 
 ```bash
-systemctl edit myservice
+systemctl edit raver-lights
 ```
 
 This will open up a text editor. Enter in the following text.
