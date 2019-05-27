@@ -54,7 +54,7 @@ const submitSimulationTrigger: AzureFunction = async (context: Context, req: Htt
   } catch (e) {
     sendResponse(
       400,
-      { error: `Could not call your Function: ${e.message}` },
+      { error: `Could not call your Function: ${e}` },
       context,
       StatType.Simulation);
     return;
