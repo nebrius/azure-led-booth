@@ -27,6 +27,8 @@ import { IBasicSubmission } from '../common/common';
 import { api, updateQueue } from '../util';
 import { reduce } from 'conditional-reduce';
 
+const BANNER_TIMEOUT = 15 * 1000;
+
 enum State {
   none = 'none',
   saving = 'saving',
@@ -186,6 +188,8 @@ export class SubmissionComponent extends React.Component<{}, ISubmissionComponen
       this._setSaveState(State.success);
     } catch (e) {
       this._setSaveState(State.error, e.message);
+    } finally {
+      setTimeout(() => this._setSaveState(State.none), BANNER_TIMEOUT);
     }
   }
 
