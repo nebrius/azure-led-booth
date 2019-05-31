@@ -28,8 +28,12 @@ const azure_iot_device_mqtt_1 = require("azure-iot-device-mqtt");
 const rvl_node_1 = require("rvl-node");
 const equals = require("deep-equal");
 const common_1 = require("./common/common");
+const node_fetch_1 = require("node-fetch");
 const IOT_HUB_DEVICE_CONNECTION_STRING = common_1.getEnvironmentVariable('IOT_HUB_DEVICE_CONNECTION_STRING');
 const RAVER_LIGHTS_INTERFACE = common_1.getEnvironmentVariable('RAVER_LIGHTS_INTERFACE');
+const API_KEY = common_1.getEnvironmentVariable('API_KEY');
+const PROCESS_QUEUE_ENDPOINT = common_1.getEnvironmentVariable('PROCESS_QUEUE_ENDPOINT');
+const QUEUE_POKE_RATE = parseInt(common_1.getEnvironmentVariable('QUEUE_POKE_RATE'), 10);
 const rvl = new rvl_node_1.RVL({
     networkInterface: RAVER_LIGHTS_INTERFACE,
     port: 4978,
@@ -60,6 +64,15 @@ function connectToIoTHub() {
             }
         });
         console.log('Connected to IoT Hub');
+        setInterval(() => {
+            node_fetch_1.default(PROCESS_QUEUE_ENDPOINT, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ apiKey: API_KEY, isTimerBased: true })
+            });
+        }, QUEUE_POKE_RATE);
     });
 }
 console.log('Starting RVL');

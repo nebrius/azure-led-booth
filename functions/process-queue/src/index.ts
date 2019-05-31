@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 import { Client } from 'azure-iothub';
-import { AzureFunction, Context } from '@azure/functions';
+import { AzureFunction, Context, HttpRequest } from '@azure/functions';
 import { createQueueService } from 'azure-storage';
 import { validate } from 'revalidator';
 import {
@@ -44,10 +44,7 @@ const IOT_HUB_CONNECTION_STRING = getEnvironmentVariable('IOT_HUB_CONNECTION_STR
 const IOT_HUB_DEVICE_ID = getEnvironmentVariable('IOT_HUB_DEVICE_ID');
 const AZURE_STORAGE_QUEUE_NAME = getEnvironmentVariable('AZURE_STORAGE_QUEUE_NAME');
 const AZURE_STORAGE_CONNECTION_STRING = getEnvironmentVariable('AZURE_STORAGE_CONNECTION_STRING');
-
-interface ITimerRequest {
-  IsPastDue: boolean;
-}
+const API_KEY = getEnvironmentVariable('API_KEY');
 
 async function sendAnimation(animation: IWaveParameters) {
   return new Promise((resolve, reject) => {
@@ -135,8 +132,17 @@ async function processDefaultAnimation() {
   await sendAnimation(animation);
 }
 
-const prcoessQueueTrigger: AzureFunction = (context: Context, timer: ITimerRequest): void => {
+const prcoessQueueTrigger: AzureFunction = (context: Context, req: HttpRequest): void => {
   const queueService = createQueueService(AZURE_STORAGE_CONNECTION_STRING);
+  if (!req.body || req.body.apiKey !== API_KEY) {
+    context.log('[ProcessQueueTrigger]: Invalid API key, not processing');
+    context.res = {
+      status: 400,
+      body: 'Not authorized'
+    };
+    return;
+  }
+  const isTimerBased: boolean = req.body.isTimerBased;
   context.log('[ProcessQueueTrigger]: Fetching or creating queue');
   queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, (createErr, createResult, createResponse) => {
     if (createErr) {
@@ -145,13 +151,27 @@ const prcoessQueueTrigger: AzureFunction = (context: Context, timer: ITimerReque
       return;
     }
 
-    // Ignore past due timers, because we don't want a rapid succession of animations
-    // Better to take too long than too short here.
-    if (timer.IsPastDue) {
-      context.log(
-        '[ProcessQueueTrigger]: Timer is past due, skipping this round until the timer infrastructure catches up');
-      context.done();
-      return;
+    // Check if this request came from a timer-based mechanism, such as the device requesting a new animation,
+    // which means we should always get the next message, or if it's something we should only run if the queue is empty
+    if (!isTimerBased) {
+      context.log('Peeking messages to see if we\'re running the default animation');
+      queueService.peekMessages(AZURE_STORAGE_QUEUE_NAME, {
+        numOfMessages: 32,
+      }, (peekErr, peekResult, peekResponse) => {
+        if (peekErr) {
+          context.log('Could not peek messages in queue');
+          context.done();
+          return;
+        }
+        if (!peekResult.length) {
+          processMessage();
+        } else {
+          context.log('Not updating animation because one is already playing');
+          context.done();
+        }
+      });
+    } else {
+      processMessage();
     }
 
     function processMessage(): void {
@@ -251,7 +271,6 @@ const prcoessQueueTrigger: AzureFunction = (context: Context, timer: ITimerReque
         }
       });
     }
-    processMessage();
   });
 };
 

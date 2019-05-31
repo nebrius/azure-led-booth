@@ -27,7 +27,9 @@ import { createTableService, TableUtilities } from 'azure-storage';
 import { getEnvironmentVariable, StatType } from '../common/common';
 import { v4 } from 'uuid';
 import { curry } from 'conditional-reduce';
+import fetch from 'node-fetch';
 
+const PROCESS_QUEUE_ENDPOINT = getEnvironmentVariable('PROCESS_QUEUE_ENDPOINT');
 const AZURE_STORAGE_TABLE_NAME = getEnvironmentVariable('AZURE_STORAGE_TABLE_NAME');
 
 interface IBody {
@@ -39,6 +41,16 @@ const logPrefixReducer = curry({
   [StatType.Custom]: () => 'CustomTrigger',
   [StatType.Simulation]: () => 'SimulationTrigger',
 }, () => 'GetQueueTrigger');
+
+export async function pokeQueue(apiKey: string, isTimerBased: boolean) {
+  await fetch(PROCESS_QUEUE_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ apiKey, isTimerBased })
+  });
+}
 
 export async function sendResponse(status: number, body: IBody, context: Context, statType?: StatType) {
   const logPrefix = logPrefixReducer(statType || '');

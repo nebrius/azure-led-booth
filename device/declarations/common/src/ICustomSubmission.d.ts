@@ -1,7 +1,7 @@
 import { IWaveParameters } from 'rvl-node-types';
 export interface ICustomSubmission {
     displayName: string;
-    authToken: string;
+    apiKey: string;
     functionUrl: string;
 }
 export interface ICustomSubmissionResponse {

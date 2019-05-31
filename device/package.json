@@ -11,6 +11,7 @@
   "devDependencies": {
     "@types/deep-equal": "^1.0.1",
     "@types/node": "^12.0.2",
+    "@types/node-fetch": "^2.3.4",
     "tslint": "^5.16.0",
     "typescript": "^3.4.5"
   },
@@ -18,6 +19,7 @@
     "azure-iot-device": "^1.9.9",
     "azure-iot-device-mqtt": "^1.9.9",
     "deep-equal": "^1.0.1",
+    "node-fetch": "^2.6.0",
     "rvl-node": "^1.0.3"
   },
   "author": "Bryan Hughes <bryan@nebri.us>",

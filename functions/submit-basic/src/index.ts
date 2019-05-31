@@ -33,10 +33,11 @@ import {
   IBasicSubmission,
   StatType
 } from './common/common';
-import { sendResponse } from './util/util';
+import { sendResponse, pokeQueue } from './util/util';
 
 const AZURE_STORAGE_QUEUE_NAME = getEnvironmentVariable('AZURE_STORAGE_QUEUE_NAME');
 const AZURE_STORAGE_CONNECTION_STRING = getEnvironmentVariable('AZURE_STORAGE_CONNECTION_STRING');
+const API_KEY = getEnvironmentVariable('API_KEY');
 
 const submitBasicTrigger: AzureFunction = (context: Context, req: HttpRequest): void => {
   context.log('[BasicTrigger]: Processing submission');
@@ -49,7 +50,7 @@ const submitBasicTrigger: AzureFunction = (context: Context, req: HttpRequest): 
 
   context.log('[BasicTrigger]: Fetching or creating queue');
   const queueService = createQueueService(AZURE_STORAGE_CONNECTION_STRING);
-  queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, (createErr, createResult, createResponse) => {
+  queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, async (createErr, createResult, createResponse) => {
     if (createErr) {
       sendResponse(500, { error: 'Could not get queue' }, context, StatType.Basic);
       return;
@@ -58,13 +59,14 @@ const submitBasicTrigger: AzureFunction = (context: Context, req: HttpRequest): 
       type: QueueType.Basic,
       submission: message
     };
+    await pokeQueue(API_KEY, false);
     context.log('[BasicTrigger]: Adding queue entry');
-    queueService.createMessage(AZURE_STORAGE_QUEUE_NAME, JSON.stringify(entry), (addErr) => {
+    queueService.createMessage(AZURE_STORAGE_QUEUE_NAME, JSON.stringify(entry), async (addErr) => {
       if (addErr) {
         sendResponse(500, { error: 'Could not add message to queue' }, context, StatType.Basic);
-      } else {
-        sendResponse(200, { status: 'ok' }, context, StatType.Basic);
+        return;
       }
+      sendResponse(200, { status: 'ok' }, context, StatType.Basic);
     });
   });
 };

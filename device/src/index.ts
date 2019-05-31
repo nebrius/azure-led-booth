@@ -27,9 +27,13 @@ import { Mqtt as Protocol } from 'azure-iot-device-mqtt';
 import { RVL, IWaveParameters } from 'rvl-node';
 import equals = require('deep-equal');
 import { getEnvironmentVariable } from './common/common';
+import fetch from 'node-fetch';
 
 const IOT_HUB_DEVICE_CONNECTION_STRING = getEnvironmentVariable('IOT_HUB_DEVICE_CONNECTION_STRING');
 const RAVER_LIGHTS_INTERFACE = getEnvironmentVariable('RAVER_LIGHTS_INTERFACE');
+const API_KEY = getEnvironmentVariable('API_KEY');
+const PROCESS_QUEUE_ENDPOINT = getEnvironmentVariable('PROCESS_QUEUE_ENDPOINT');
+const QUEUE_POKE_RATE = parseInt(getEnvironmentVariable('QUEUE_POKE_RATE'), 10);
 
 const rvl = new RVL({
   networkInterface: RAVER_LIGHTS_INTERFACE,
@@ -64,6 +68,16 @@ function connectToIoTHub(): void {
       }
     });
     console.log('Connected to IoT Hub');
+
+    setInterval(() => {
+      fetch(PROCESS_QUEUE_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ apiKey: API_KEY, isTimerBased: true })
+      });
+    }, QUEUE_POKE_RATE);
   });
 }
 

@@ -27,12 +27,24 @@ const azure_storage_1 = require("azure-storage");
 const common_1 = require("../common/common");
 const uuid_1 = require("uuid");
 const conditional_reduce_1 = require("conditional-reduce");
+const node_fetch_1 = require("node-fetch");
+const PROCESS_QUEUE_ENDPOINT = common_1.getEnvironmentVariable('PROCESS_QUEUE_ENDPOINT');
 const AZURE_STORAGE_TABLE_NAME = common_1.getEnvironmentVariable('AZURE_STORAGE_TABLE_NAME');
 const logPrefixReducer = conditional_reduce_1.curry({
     [common_1.StatType.Basic]: () => 'BasicTrigger',
     [common_1.StatType.Custom]: () => 'CustomTrigger',
     [common_1.StatType.Simulation]: () => 'SimulationTrigger',
 }, () => 'GetQueueTrigger');
+async function pokeQueue(apiKey, isTimerBased) {
+    await node_fetch_1.default(PROCESS_QUEUE_ENDPOINT, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ apiKey, isTimerBased })
+    });
+}
+exports.pokeQueue = pokeQueue;
 async function sendResponse(status, body, context, statType) {
     const logPrefix = logPrefixReducer(statType || '');
     context.log(`[${logPrefix}]: Sending ${status} response for ${statType ? `${statType} submission` : 'get-queue'}`);

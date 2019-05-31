@@ -22,14 +22,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
 Object.defineProperty(exports, "__esModule", { value: true });
-__export(require("./src/util"));
-__export(require("./src/IBasicSubmission"));
-__export(require("./src/ICustomSubmission"));
-__export(require("./src/ISimulationSubmission"));
-__export(require("./src/IQueue"));
-__export(require("./src/IStat"));
-//# sourceMappingURL=common.js.map
+// Force to "any" type, otherwise TypeScript thinks the type is too strict and won't ever compile
+exports.simulationSubmissionSchema = {
+    properties: {
+        functionUrl: {
+            type: 'string',
+            pattern: '^https\:\/\/[a-zA-Z0-9\-]*?\.azurewebsites\.net\/.*$',
+            required: true
+        },
+        apiKey: {
+            type: 'string',
+            required: false
+        }
+    }
+};
+//# sourceMappingURL=ISimulationSubmission.js.map

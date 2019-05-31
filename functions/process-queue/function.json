@@ -1,12 +1,18 @@
 {
   "bindings": [
     {
-      "name": "myTimer",
-      "type": "timerTrigger",
+      "authLevel": "anonymous",
+      "type": "httpTrigger",
       "direction": "in",
-      "schedule": "0 */2 * * * *",
-      "useMonitor": true,
-      "runOnStartup": false
+      "name": "req",
+      "methods": [
+        "post"
+      ]
+    },
+    {
+      "type": "http",
+      "direction": "out",
+      "name": "res"
     }
   ],
   "scriptFile": "./dist/index.js"
