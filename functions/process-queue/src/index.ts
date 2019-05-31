@@ -174,6 +174,7 @@ const prcoessQueueTrigger: AzureFunction = (context: Context, req: HttpRequest):
           } else {
             context.log('Updated the animation state');
           }
+          cb();
         });
       }
 
@@ -226,6 +227,7 @@ const prcoessQueueTrigger: AzureFunction = (context: Context, req: HttpRequest):
               .catch((err: Error) => {
                 context.log(
                   `[ProcessQueueTrigger]: Could not process default animation, skipping animation: ${err.message}`);
+                context.done();
               });
             return;
           }

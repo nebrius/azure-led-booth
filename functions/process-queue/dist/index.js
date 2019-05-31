@@ -152,6 +152,7 @@ const prcoessQueueTrigger = (context, req) => {
                     else {
                         context.log('Updated the animation state');
                     }
+                    cb();
                 });
             }
             // Check if this request came from a timer-based mechanism, such as the device requesting a new animation, which
@@ -196,6 +197,7 @@ const prcoessQueueTrigger = (context, req) => {
                         })
                             .catch((err) => {
                             context.log(`[ProcessQueueTrigger]: Could not process default animation, skipping animation: ${err.message}`);
+                            context.done();
                         });
                         return;
                     }
