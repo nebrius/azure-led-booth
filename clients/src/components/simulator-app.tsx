@@ -38,7 +38,10 @@ interface IAppComponentProps {
 export function AppComponent(props: IAppComponentProps): JSX.Element {
   return (
     <div className="app">
-      <header className="header"><h1>Azure LED Simulator</h1></header>
+      <header className="header">
+        <div><h1>Azure LED Simulator</h1></div>
+        <div><h2><a href="https://aka.ms/jsconfeu/led">aka.ms/jsconfeu/led</a></h2></div>
+        </header>
       <ControlsComponent
         waveParameters={props.waveParameters}
         onWaveParametersUpdated={props.onWaveParametersUpdated} />
