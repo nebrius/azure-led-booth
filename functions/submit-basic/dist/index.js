@@ -48,13 +48,13 @@ const submitBasicTrigger = (context, req) => {
             type: common_1.QueueType.Basic,
             submission: message
         };
-        await util_1.pokeQueue(API_KEY, false);
         context.log('[BasicTrigger]: Adding queue entry');
         queueService.createMessage(AZURE_STORAGE_QUEUE_NAME, JSON.stringify(entry), async (addErr) => {
             if (addErr) {
                 util_1.sendResponse(500, { error: 'Could not add message to queue' }, context, common_1.StatType.Basic);
                 return;
             }
+            util_1.pokeQueue(API_KEY, false);
             util_1.sendResponse(200, { status: 'ok' }, context, common_1.StatType.Basic);
         });
     });

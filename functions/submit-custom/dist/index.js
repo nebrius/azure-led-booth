@@ -29,6 +29,7 @@ const common_1 = require("./common/common");
 const util_1 = require("./util/util");
 const AZURE_STORAGE_QUEUE_NAME = common_1.getEnvironmentVariable('AZURE_STORAGE_QUEUE_NAME');
 const AZURE_STORAGE_CONNECTION_STRING = common_1.getEnvironmentVariable('AZURE_STORAGE_CONNECTION_STRING');
+const API_KEY = common_1.getEnvironmentVariable('API_KEY');
 const submitCustomTrigger = (context, req) => {
     context.log('[CustomTrigger]: Processing submission');
     const message = req.body;
@@ -38,11 +39,12 @@ const submitCustomTrigger = (context, req) => {
     }
     context.log('[CustomTrigger]: Fetching or creating queue');
     const queueService = azure_storage_1.createQueueService(AZURE_STORAGE_CONNECTION_STRING);
-    queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, (createErr, createResult, createResponse) => {
+    queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, async (createErr, createResult, createResponse) => {
         if (createErr) {
             util_1.sendResponse(500, { error: 'Could not get queue' }, context, common_1.StatType.Custom);
             return;
         }
+        await util_1.pokeQueue(API_KEY, false);
         const entry = {
             type: common_1.QueueType.Custom,
             submission: message

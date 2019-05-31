@@ -33,10 +33,11 @@ import {
   StatType,
   QueueType
 } from './common/common';
-import { sendResponse } from './util/util';
+import { sendResponse, pokeQueue } from './util/util';
 
 const AZURE_STORAGE_QUEUE_NAME = getEnvironmentVariable('AZURE_STORAGE_QUEUE_NAME');
 const AZURE_STORAGE_CONNECTION_STRING = getEnvironmentVariable('AZURE_STORAGE_CONNECTION_STRING');
+const API_KEY = getEnvironmentVariable('API_KEY');
 
 const submitCustomTrigger: AzureFunction = (context: Context, req: HttpRequest): void => {
   context.log('[CustomTrigger]: Processing submission');
@@ -49,11 +50,12 @@ const submitCustomTrigger: AzureFunction = (context: Context, req: HttpRequest):
 
   context.log('[CustomTrigger]: Fetching or creating queue');
   const queueService = createQueueService(AZURE_STORAGE_CONNECTION_STRING);
-  queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, (createErr, createResult, createResponse) => {
+  queueService.createQueueIfNotExists(AZURE_STORAGE_QUEUE_NAME, async (createErr, createResult, createResponse) => {
     if (createErr) {
       sendResponse(500, { error: 'Could not get queue' }, context, StatType.Custom);
       return;
     }
+    await pokeQueue(API_KEY, false);
     const entry: ICustomQueueEntry = {
       type: QueueType.Custom,
       submission: message

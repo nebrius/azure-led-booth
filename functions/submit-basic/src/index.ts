@@ -59,13 +59,13 @@ const submitBasicTrigger: AzureFunction = (context: Context, req: HttpRequest): 
       type: QueueType.Basic,
       submission: message
     };
-    await pokeQueue(API_KEY, false);
     context.log('[BasicTrigger]: Adding queue entry');
     queueService.createMessage(AZURE_STORAGE_QUEUE_NAME, JSON.stringify(entry), async (addErr) => {
       if (addErr) {
         sendResponse(500, { error: 'Could not add message to queue' }, context, StatType.Basic);
         return;
       }
+      pokeQueue(API_KEY, false);
       sendResponse(200, { status: 'ok' }, context, StatType.Basic);
     });
   });
