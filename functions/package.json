@@ -40,7 +40,7 @@
     "azure-storage": "^2.10.3",
     "color-convert": "^2.0.0",
     "conditional-reduce": "^1.2.0",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.7",
     "revalidator": "^0.3.1",
     "rvl-node-animations": "^1.0.1",
     "uuid": "^3.3.2"
